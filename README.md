@@ -8,7 +8,9 @@ Based on the Bare Bones OS at https://wiki.osdev.org/
 
 ## Todo
 - [x] Add support for newlines to terminal driver
-- [ ] Implement terminal scrolling
+- [x] Implement terminal scrolling
+- [ ] Reorganise into a proper OS skeleton
+- [ ] Implement standard library stuff
 
 ## Research
 ### Boot
