@@ -1,5 +1,5 @@
 # owOS
-Based on the Bare Bones OS at https://wiki.osdev.org/
+check out https://wiki.osdev.org/
 
 ## Prerequisites
 - vnc
