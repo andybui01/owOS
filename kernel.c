@@ -79,6 +79,14 @@ void terminal_setcolor(uint8_t color)
  
 void terminal_putentryat(char c, uint8_t color, size_t x, size_t y) 
 {
+	// Check if newline character
+	if (c == '\n') {
+		// TODO: Check if end of terminal
+		terminal_row++;
+		terminal_column = -1;
+		return;
+	}
+
 	const size_t index = y * VGA_WIDTH + x;
 	terminal_buffer[index] = vga_entry(c, color);
 }
@@ -111,4 +119,5 @@ void kernel_main(void)
 	
 	/* Write string to terminal */
 	terminal_writestring("Hello, kernel World!\n");
+	terminal_writestring("I was created by Andy Bui\nlegend\n");
 }
