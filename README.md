@@ -11,7 +11,8 @@ check out https://wiki.osdev.org/
 - [x] Implement terminal scrolling
 - [x] Reorganise into a proper OS skeleton
 - [x] Implement standard library stuff
-- [ ] Implement keyboard interrupts
+- [x] Implement GDT
+- [ ] Implement IDT and keyboard interrupts
 
 ## Research
 ### Boot
