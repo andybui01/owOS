@@ -2,6 +2,7 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <string.h>
+#include <stdio.h>
 
 #include <kernel/tty.h>
 
@@ -37,6 +38,7 @@ void terminal_initialize(void) {
 			terminal_buffer[index] = vga_entry(' ', terminal_color);
 		}
 	}
+	printf("Terminal initiated!\n");
 	terminal_input_line();
 }
  

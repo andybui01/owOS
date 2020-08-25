@@ -1,43 +1,22 @@
 #include <kernel/gdt.h>
 #include <stdint.h>
-
-// We define these variables in this order so that for the entire GDT entry
-// all the bits are next to each other in memory
-// i.e. this struct is effectively a bit string
-struct gdt_entry {
-
-	uint16_t limit_low;
-	uint16_t base_low;
-	uint8_t base_middle;
-	uint8_t access;
-	uint8_t granularity;
-	uint8_t base_high;
-
-}__attribute__((packed));
-
-// Special pointer which includes the limit:
-// max bytes taken up by GDT minus 1
-// THIS IS WHERE OUR GDT IS IN MEMORY!
-struct gdt_ptr {
-	uint16_t limit;
-	uint32_t base;
-} __attribute__((packed));
+#include <stdio.h>
 
 // Actual table
-struct gdt_entry gdt[3];
-struct gdt_ptr gp;
+gdt_entry_t gdt[3];
+gdt_ptr_t gp;
 
 // Later on we'll call gdt_flush to put in new gdt
-extern void gdt_flush();
+extern void gdt_flush(uintptr_t);
 
 void gdt_bootstrap() {
 	
 	// Set up GDT pointer and limit
-	gp.limit = (sizeof(struct gdt_entry) * 3) - 1;
-	gp.base = &gdt;
+	gp.limit = (sizeof(gdt_entry_t) * 3) - 1;
+	gp.base = (uintptr_t) &gdt;
 
 	// NULL descriptor
-	gdt_create_desc(0, 0, 0, 0, 0)
+	gdt_create_desc(0, 0, 0, 0, 0);
 
 	// Since we're using a flat setup, the code and data segment overlaps.
 	// Effectively, both have limits of 4KB and a base of 0.
@@ -46,10 +25,14 @@ void gdt_bootstrap() {
 	gdt_create_desc(1, 0, 0xFFFFFFFF, 0x9A, 0xCF);
 
 	// DATA segment descriptor
-	gdt_create_desc(1, 0, 0xFFFFFFFF, 0x92, 0xCF);
+	gdt_create_desc(2, 0, 0xFFFFFFFF, 0x92, 0xCF);
+
+	// TODO: add non/privileged code/data segments? (all overlapping)
 
 	// Flush old GDT (GRUB) and implement new one
-	gdt_flush();
+	gdt_flush((uintptr_t) &gp);
+
+	printf("GDT created!\n");
 
 }
 
