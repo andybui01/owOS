@@ -2,6 +2,7 @@
 
 #include <kernel/tty.h>
 #include <kernel/gdt.h>
+#include <kernel/idt.h>
 
 void kernel_main(void) {
 
@@ -10,5 +11,8 @@ void kernel_main(void) {
 
 	// initialize GDT
 	gdt_bootstrap();
+
+	// initialize IDT
+	idt_bootstrap();
 
 }

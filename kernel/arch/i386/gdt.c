@@ -2,7 +2,7 @@
 #include <stdint.h>
 #include <stdio.h>
 
-// Actual table
+// global descriptor table
 gdt_entry_t gdt[3];
 gdt_ptr_t gp;
 
@@ -29,6 +29,9 @@ void gdt_bootstrap() {
 
 	// TODO: add non/privileged code/data segments? (all overlapping)
 
+	// Task state segment (TSS) descriptor
+	// gdt_create_desc(3, 0, 0xFFFFFFFF, 0x89, 0x4F);
+ 
 	// Flush old GDT (GRUB) and implement new one
 	gdt_flush((uintptr_t) &gp);
 
@@ -37,7 +40,7 @@ void gdt_bootstrap() {
 }
 
 // Create a GDT descriptor
-void gdt_create_desc(int num, uint32_t base, uint32_t limit, uint16_t access, uint8_t gran) {
+void gdt_create_desc(int num, uint32_t base, uint32_t limit, uint8_t access, uint8_t gran) {
 
 	// Set the descriptor base address
 	gdt[num].base_low = (base & 0xFFFF);
