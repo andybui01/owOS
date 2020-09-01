@@ -14,5 +14,11 @@ void kernel_main(void) {
 
 	// initialize IDT
 	idt_bootstrap();
+	isrs_install();
+
+	// try to trigger exception handler
+	printf("try this!\n");
+	int a = 5/0;
+	(void) a;
 
 }

@@ -6,9 +6,6 @@
 gdt_entry_t gdt[3];
 gdt_ptr_t gp;
 
-// Later on we'll call gdt_flush to put in new gdt
-extern void gdt_flush(uintptr_t);
-
 void gdt_bootstrap() {
 	
 	// Set up GDT pointer and limit
