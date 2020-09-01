@@ -66,21 +66,22 @@ void idt_create_gate(int num, uint32_t offset, uint16_t selector, uint8_t type_a
     // uint32_t offset = (uint32_t) base;
 
     idt[num].offset_1 = (offset & 0xFFFF);
-    idt[num].offset_2 = (offset >> 16) && 0xFFFF;
+    idt[num].offset_2 = (offset >> 16) & 0xFFFF;
 
     idt[num].selector = selector;
 
     idt[num].zero = 0;
 
-    idt[num].type_attr = type_attr;
+    idt[num].type_attr = type_attr | 0x60;
 
 }
 
 void fault_handler(struct regs *r) {
-    printf(exception_messages[r->int_no]);
-    if (r->int_no == 1) {
-        printf("Detect interrupt!\n");
+	
+	printf("%s\n", exception_messages[r->int_no]);
+
+    if (r->int_no < 32) {
+        printf("Detect interrupt! Hanging...\n");
         for (;;);
     }
 }
-

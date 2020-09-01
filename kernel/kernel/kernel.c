@@ -4,6 +4,8 @@
 #include <kernel/gdt.h>
 #include <kernel/idt.h>
 
+#include <debug.h>
+
 void kernel_main(void) {
 
 	// initialize terminal
@@ -15,10 +17,12 @@ void kernel_main(void) {
 	// initialize IDT
 	idt_bootstrap();
 	isrs_install();
+	kbreak();
 
-	// try to trigger exception handler
-	printf("try this!\n");
+	// try to trigger exception handler with a
+	// division by zero error
 	int a = 5/0;
+	kbreak();
 	(void) a;
 
 }
