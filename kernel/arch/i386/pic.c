@@ -10,6 +10,8 @@
 #define SPIC_COMMAND SPIC
 #define SPIC_DATA (SPIC+1)  // Set A0 bit to 1
 
+#define PIC_EOI     0x20
+
 #define ICW1_IC4    0x01    // ICW4 bit
 #define ICW1_SNGL   0x02    // Single bit, if not then cascade mode
 #define ICW1_ADI    0x04    // Address interval 1 if set or 8 if not
@@ -35,8 +37,8 @@
 void pic_remap(uint8_t offset_m, uint8_t offset_s) {
     
     // backup masks
-    uint8_t backup_m inb(MPIC_DATA);
-    uint8_t backup_s inb(SPIC_DATA);
+    uint8_t backup_m = inb(MPIC_DATA);
+    uint8_t backup_s = inb(SPIC_DATA);
 
     // ICW1, initialise in cascade mode
     outb(MPIC_COMMAND, ICW1_INIT | ICW1_IC4);
@@ -68,6 +70,18 @@ void pic_remap(uint8_t offset_m, uint8_t offset_s) {
     outb(SPIC_DATA, backup_s);
     io_wait();
 
+    // TEMPORARY: enable keyboard interrupts
+    outb(MPIC_DATA, 0xfd);
+    outb(SPIC_DATA, 0xff);
+    asm("sti");
+
     // io_wait()'s ensure old machines have 
     // enough time for PIC to react to commands.
+}
+
+// OCW2 - signal EOI
+void pic_send_eoi(uint8_t irq) {
+    if (irq >= 8)
+        outb(SPIC_COMMAND, PIC_EOI);
+    outb(MPIC_COMMAND, PIC_EOI);
 }

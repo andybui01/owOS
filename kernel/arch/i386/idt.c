@@ -9,7 +9,7 @@ idt_ptr_t ip;
 
 extern void idt_flush(uintptr_t);
 
-static const char *exception_messages[32] = {
+static const char *exception_messages[34] = {
 	"Division by zero",
 	"Debug",
 	"Non-maskable interrupt",
@@ -41,7 +41,9 @@ static const char *exception_messages[32] = {
 	"Reserved",
 	"Reserved",
 	"Reserved",
-	"Reserved"
+	"Reserved",
+	"Timer",
+	"Keyboard"
 };
 
 void idt_bootstrap() {
@@ -59,7 +61,8 @@ void isrs_install() {
 	printf("Instaling ISRs\n");
 	idt_create_gate(0, (uint32_t) &_isr0, 0x08, 0x8E);
 	idt_create_gate(1, (uint32_t) &_isr1, 0x08, 0x8E);
-	idt_create_gate(9, (uint32_t) &_isr9, 0x08, 0x8E);
+	idt_create_gate(32, (uint32_t) &_isr32, 0x08, 0x8E);
+	idt_create_gate(33, (uint32_t) &_isr33, 0x08, 0x8E);
 }
 
 void idt_create_gate(int num, uint32_t offset, uint16_t selector, uint8_t type_attr) {
@@ -78,10 +81,11 @@ void idt_create_gate(int num, uint32_t offset, uint16_t selector, uint8_t type_a
 }
 
 void fault_handler(struct regs *r) {
-	
+
+	printf("Within fh\n");
 	printf("%s\n", exception_messages[r->int_no]);
 
-    if (r->int_no < 32) {
+    if (r->int_no == 33) {
         printf("Detect interrupt! Hanging...\n");
         for (;;);
     }
