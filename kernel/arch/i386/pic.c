@@ -70,9 +70,10 @@ void pic_remap(uint8_t offset_m, uint8_t offset_s) {
     outb(SPIC_DATA, backup_s);
     io_wait();
 
-    // TEMPORARY: enable keyboard interrupts
-    outb(MPIC_DATA, 0xfd);
-    outb(SPIC_DATA, 0xff);
+    // Disable timer...for now
+    irq_set_mask(0);
+    // Enable keyboard interrupts
+    irq_clear_mask(1);
     asm("sti");
 
     // io_wait()'s ensure old machines have 
@@ -84,4 +85,32 @@ void pic_send_eoi(uint8_t irq) {
     if (irq >= 8)
         outb(SPIC_COMMAND, PIC_EOI);
     outb(MPIC_COMMAND, PIC_EOI);
+}
+
+void irq_set_mask(uint8_t irq) {
+    uint16_t port;
+    uint8_t value;
+ 
+    if(irq < 8) {
+        port = MPIC_DATA;
+    } else {
+        port = SPIC_DATA;
+        irq -= 8;
+    }
+    value = inb(port) | (1 << irq);
+    outb(port, value);        
+}
+ 
+void irq_clear_mask(uint8_t irq) {
+    uint16_t port;
+    uint8_t value;
+ 
+    if(irq < 8) {
+        port = MPIC_DATA;
+    } else {
+        port = SPIC_DATA;
+        irq -= 8;
+    }
+    value = inb(port) & ~(1 << irq);
+    outb(port, value);        
 }

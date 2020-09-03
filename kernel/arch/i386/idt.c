@@ -1,4 +1,7 @@
 #include <kernel/idt.h>
+#include <kernel/pic.h>
+#include <kernel/system.h>
+
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
@@ -82,11 +85,13 @@ void idt_create_gate(int num, uint32_t offset, uint16_t selector, uint8_t type_a
 
 void fault_handler(struct regs *r) {
 
-	printf("Within fh\n");
+	// printf("Within fh\n");
 	printf("%s\n", exception_messages[r->int_no]);
 
     if (r->int_no == 33) {
-        printf("Detect interrupt! Hanging...\n");
-        for (;;);
+        // printf("Detect keyboard input\n");
+		unsigned char scan_code = inb(0x60);
+		(void) scan_code;
+		pic_send_eoi(1);
     }
 }
