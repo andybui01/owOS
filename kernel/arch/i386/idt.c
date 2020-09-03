@@ -59,6 +59,7 @@ void isrs_install() {
 	printf("Instaling ISRs\n");
 	idt_create_gate(0, (uint32_t) &_isr0, 0x08, 0x8E);
 	idt_create_gate(1, (uint32_t) &_isr1, 0x08, 0x8E);
+	idt_create_gate(9, (uint32_t) &_isr9, 0x08, 0x8E);
 }
 
 void idt_create_gate(int num, uint32_t offset, uint16_t selector, uint8_t type_attr) {

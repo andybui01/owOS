@@ -17,12 +17,15 @@ void kernel_main(void) {
 	// initialize IDT
 	idt_bootstrap();
 	isrs_install();
-	kbreak();
 
 	// try to trigger exception handler with a
 	// division by zero error
-	int a = 5/0;
-	kbreak();
-	(void) a;
+	// int a = 5/0;
+	// (void) a;
+
+	// infinite loop ya!
+	for (;;) {
+		asm("hlt");
+	}
 
 }

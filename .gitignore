@@ -1,0 +1,1 @@
+test/boot.S test/boot.sh test/gdt.c test/gdt_flush.S test/gdt.h test/grub.cfg test/idt.c test/idt_flush.S test/idt.h test/isodir test/isr.S test/kernel.c test/linker.ld test/myos.bin test/myos.iso test/tty.c test/tty.h test/vga.h
