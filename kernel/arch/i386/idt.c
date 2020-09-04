@@ -1,6 +1,6 @@
 #include <kernel/idt.h>
-#include <kernel/pic.h>
-#include <kernel/system.h>
+#include <kernel/irq.h>
+#include <int/regs.h>
 
 #include <stdint.h>
 #include <stdio.h>
@@ -10,7 +10,8 @@
 idt_gate_t idt[256];
 idt_ptr_t ip;
 
-extern void idt_flush(uintptr_t);
+// table for C-level fault handlers
+irq_handler_t handlers[256] = {0};
 
 static const char *exception_messages[34] = {
 	"Division by zero",
@@ -58,6 +59,8 @@ void idt_bootstrap() {
 
     idt_flush((uintptr_t)&ip);
     printf("IDT created!\n");
+
+	isrs_install();
 }
 
 void isrs_install() {
@@ -66,11 +69,11 @@ void isrs_install() {
 	idt_create_gate(1, (uint32_t) &_isr1, 0x08, 0x8E);
 	idt_create_gate(32, (uint32_t) &_isr32, 0x08, 0x8E);
 	idt_create_gate(33, (uint32_t) &_isr33, 0x08, 0x8E);
+
+	irq_install_handlers();
 }
 
 void idt_create_gate(int num, uint32_t offset, uint16_t selector, uint8_t type_attr) {
-
-    // uint32_t offset = (uint32_t) base;
 
     idt[num].offset_1 = (offset & 0xFFFF);
     idt[num].offset_2 = (offset >> 16) & 0xFFFF;
@@ -79,19 +82,28 @@ void idt_create_gate(int num, uint32_t offset, uint16_t selector, uint8_t type_a
 
     idt[num].zero = 0;
 
-    idt[num].type_attr = type_attr | 0x60;
-
+    idt[num].type_attr = type_attr | 0x60; // force to ring 0: change later
 }
 
-void fault_handler(struct regs *r) {
+void isr_install_handler(int index, irq_handler_t handler) {
+	handlers[index] = handler;
+}
 
-	// printf("Within fh\n");
+void isr_uninstall_handler(int index) {
+	handlers[index] = 0;
+}
+
+void fault_handler(regs_t *r) {
+
 	printf("%s\n", exception_messages[r->int_no]);
 
-    if (r->int_no == 33) {
-        // printf("Detect keyboard input\n");
-		unsigned char scan_code = inb(0x60);
-		(void) scan_code;
-		pic_send_eoi(1);
-    }
+	irq_handler_t handler = handlers[r->int_no];
+
+	if (handler) {
+		handler(r);
+	} else {
+		// unhandled exception, die
+		printf("unhandled exception #%d: dying :(\n", r->int_no);
+		for (;;);
+	}
 }

@@ -2,6 +2,8 @@
 #define _KERNEL_IDT_H
 
 #include <stdint.h>
+#include <int/regs.h>
+#include <kernel/irq.h>
 
 // The IDT entries are called gates.
 // It can contain Interrupt Gates, Task Gates and Trap Gates.
@@ -22,18 +24,15 @@ struct idt_ptr {
 
 typedef struct idt_ptr idt_ptr_t;
 
-/* This defines what the stack looks like after an ISR was running */
-struct regs {
-    unsigned int gs, fs, es, ds;      /* pushed the segs last */
-    unsigned int edi, esi, ebp, esp, ebx, edx, ecx, eax;  /* pushed by 'pusha' */
-    unsigned int int_no, err_code;    /* our 'push 0xYYYY' and ecodes do this */
-    unsigned int eip, cs, eflags, useresp, ss;   /* pushed by the processor automatically */ 
-};
-
 void idt_bootstrap();
-void idt_create_gate(int num, uint32_t offset, uint16_t selector, uint8_t type_attr);
-void fault_handler(struct regs *r);
 void isrs_install();
+void idt_create_gate(int num, uint32_t offset, uint16_t selector, uint8_t type_attr);
+
+void isr_install_handler(int index, irq_handler_t handler);
+void isr_uninstall_handler(int index);
+void fault_handler(regs_t *r);
+
+extern void idt_flush(uintptr_t);
 
 extern void _isr0();
 extern void _isr1();

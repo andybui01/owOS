@@ -27,14 +27,25 @@ CPPFLAGS:=$(CPPFLAGS) $(KERNEL_ARCH_CPPFLAGS)
 LDFLAGS:=$(LDFLAGS) $(KERNEL_ARCH_LDFLAGS)
 LIBS:=$(LIBS) $(KERNEL_ARCH_LIBS)
 
-KERNEL_OBJS=\
+ALL_OBJS=\
 $(KERNEL_ARCH_OBJS) \
 kernel/kernel.o \
+
+
+include drivers/make.config
+
+CFLAGS:=$(CFLAGS) $(DRIVERS_CFLAGS)
+CPPFLAGS:=$(CPPFLAGS) $(DRIVERS_CPPFLAGS)
+LDFLAGS:=$(LDFLAGS) $(DRIVERS_LDFLAGS)
+LIBS:=$(LIBS) $(DRIVERS_LIBS)
+
+ALL_OBJS:=$(ALL_OBJS) \
+$(DRIVERS_OBJS) \
 
 OBJS=\
 $(ARCHDIR)/crti.o \
 $(ARCHDIR)/crtbegin.o \
-$(KERNEL_OBJS) \
+$(ALL_OBJS) \
 $(ARCHDIR)/crtend.o \
 $(ARCHDIR)/crtn.o \
 
@@ -42,7 +53,7 @@ LINK_LIST=\
 $(LDFLAGS) \
 $(ARCHDIR)/crti.o \
 $(ARCHDIR)/crtbegin.o \
-$(KERNEL_OBJS) \
+$(ALL_OBJS) \
 $(LIBS) \
 $(ARCHDIR)/crtend.o \
 $(ARCHDIR)/crtn.o \
@@ -57,7 +68,7 @@ owos.kernel: $(OBJS) $(ARCHDIR)/linker.ld
 	grub-file --is-x86-multiboot owos.kernel
 
 $(ARCHDIR)/crtbegin.o $(ARCHDIR)/crtend.o:
-	OBJ=`$(CC) $(CFLAGS) $(LDFLAGS) -print-file-name=$(@F)` && cp "$$OBJ" $@
+	OBJ=`$(CC) $(CFAGS) $(LDFLAGS) -print-file-name=$(@F)` && cp "$$OBJ" $@
 
 .c.o:
 	$(CC) -MD -c $< -o $@ -std=gnu11 $(CFLAGS) $(CPPFLAGS)

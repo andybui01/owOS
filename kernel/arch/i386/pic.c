@@ -55,7 +55,7 @@ void pic_remap(uint8_t offset_m, uint8_t offset_s) {
     // ICW3
     outb(MPIC_DATA, 0b00000100); // MPIC has a single slave at IRQ2
     io_wait();
-    outb(SPIC_DATA, 0b00000010); // SPIC has a case cade identity of 2
+    outb(SPIC_DATA, 0b00000010); // SPIC has a casecade identity of 2
     io_wait();
 
     // ICW4
@@ -113,4 +113,8 @@ void irq_clear_mask(uint8_t irq) {
     }
     value = inb(port) & ~(1 << irq);
     outb(port, value);        
+}
+
+uint8_t pic_scan_code() {
+    return inb(0x60);
 }
