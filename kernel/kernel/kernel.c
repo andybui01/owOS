@@ -5,6 +5,8 @@
 #include <kernel/idt.h>
 #include <kernel/pic.h>
 
+#include <drivers/kbd.h>
+
 #include <debug.h>
 
 void kernel_main(void) {
@@ -18,11 +20,10 @@ void kernel_main(void) {
 	// initialize IDT
 	idt_bootstrap();
 
-	// install fault handlers
-	isrs_install();
-
 	// remap PIC
 	pic_remap(0x20, 0x28);
+
+	keyboard_test();
 
 	// try to trigger exception handler with a
 	// division by zero error

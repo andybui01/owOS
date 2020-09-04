@@ -58,6 +58,8 @@ void idt_bootstrap() {
 
     idt_flush((uintptr_t)&ip);
     printf("IDT created!\n");
+
+	isrs_install();
 }
 
 void isrs_install() {
@@ -70,8 +72,6 @@ void isrs_install() {
 
 void idt_create_gate(int num, uint32_t offset, uint16_t selector, uint8_t type_attr) {
 
-    // uint32_t offset = (uint32_t) base;
-
     idt[num].offset_1 = (offset & 0xFFFF);
     idt[num].offset_2 = (offset >> 16) & 0xFFFF;
 
@@ -80,16 +80,13 @@ void idt_create_gate(int num, uint32_t offset, uint16_t selector, uint8_t type_a
     idt[num].zero = 0;
 
     idt[num].type_attr = type_attr | 0x60;
-
 }
 
 void fault_handler(struct regs *r) {
 
-	// printf("Within fh\n");
 	printf("%s\n", exception_messages[r->int_no]);
 
     if (r->int_no == 33) {
-        // printf("Detect keyboard input\n");
 		unsigned char scan_code = inb(0x60);
 		(void) scan_code;
 		pic_send_eoi(1);
