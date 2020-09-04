@@ -23,8 +23,6 @@ void kernel_main(void) {
 	// remap PIC
 	pic_remap(0x20, 0x28);
 
-	keyboard_test();
-
 	// try to trigger exception handler with a
 	// division by zero error
 	// int a = 5/0;
