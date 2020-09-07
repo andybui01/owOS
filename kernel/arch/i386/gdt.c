@@ -32,8 +32,6 @@ void gdt_bootstrap() {
 	// Flush old GDT (GRUB) and implement new one
 	gdt_flush((uintptr_t) &gp);
 
-	printf("GDT created!\n");
-
 }
 
 // Create a GDT descriptor

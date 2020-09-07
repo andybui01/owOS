@@ -58,13 +58,11 @@ void idt_bootstrap() {
     memset(&idt, 0, sizeof(idt));
 
     idt_flush((uintptr_t)&ip);
-    printf("IDT created!\n");
 
 	isrs_install();
 }
 
 void isrs_install() {
-	printf("Instaling ISRs\n");
 	idt_create_gate(0, (uint32_t) &_isr0, 0x08, 0x8E);
 	idt_create_gate(1, (uint32_t) &_isr1, 0x08, 0x8E);
 	idt_create_gate(32, (uint32_t) &_isr32, 0x08, 0x8E);
@@ -94,8 +92,6 @@ void isr_uninstall_handler(int index) {
 }
 
 void fault_handler(regs_t *r) {
-
-	printf("%s\n", exception_messages[r->int_no]);
 
 	irq_handler_t handler = handlers[r->int_no];
 
