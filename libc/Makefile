@@ -39,6 +39,7 @@ string/memmove.o \
 string/memset.o \
 string/strlen.o \
 debug/kbreak.o \
+ds/circ_bbuf.o \
 
 HOSTEDOBJS=\
 $(ARCH_HOSTEDOBJS) \
