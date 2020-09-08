@@ -7,12 +7,12 @@
 // all the bits are next to each other in memory
 // i.e. this struct is effectively a bit string
 struct gdt_entry {
-	uint16_t limit_low;
-	uint16_t base_low;
-	uint8_t base_middle;
-	uint8_t access;
-	uint8_t granularity; // flags 55:52 and limit 51:48
-	uint8_t base_high;
+    uint16_t limit_low;
+    uint16_t base_low;
+    uint8_t base_middle;
+    uint8_t access;
+    uint8_t granularity; // flags 55:52 and limit 51:48
+    uint8_t base_high;
 }__attribute__((packed));
 
 typedef struct gdt_entry gdt_entry_t;
@@ -21,8 +21,8 @@ typedef struct gdt_entry gdt_entry_t;
 // max bytes taken up by GDT minus 1
 // THIS IS WHERE OUR GDT IS IN MEMORY!
 struct gdt_ptr {
-	uint16_t limit;
-	uint32_t base;
+    uint16_t limit;
+    uint32_t base;
 } __attribute__((packed));
 
 typedef struct gdt_ptr gdt_ptr_t;

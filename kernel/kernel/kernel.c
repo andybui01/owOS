@@ -11,26 +11,26 @@
 
 void kernel_main(void) {
 
-	// initialize terminal
-	terminal_initialize();
+    // initialize terminal
+    terminal_initialize();
 
-	// initialize GDT
-	gdt_bootstrap();
+    // initialize GDT
+    gdt_bootstrap();
 
-	// initialize IDT
-	idt_bootstrap();
+    // initialize IDT
+    idt_bootstrap();
 
-	// remap PIC
-	pic_remap(0x20, 0x28);
+    // remap PIC
+    pic_remap(0x20, 0x28);
 
-	// try to trigger exception handler with a
-	// division by zero error
-	// int a = 5/0;
-	// (void) a;
+    // try to trigger exception handler with a
+    // division by zero error
+    // int a = 5/0;
+    // (void) a;
 
-	// infinite loop ya!
-	for (;;) {
-		asm("hlt");
-	}
+    // infinite loop ya!
+    for (;;) {
+        asm("hlt");
+    }
 
 }
