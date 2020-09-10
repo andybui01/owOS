@@ -9,7 +9,7 @@
 #include "vga.h"
 
 static const size_t VGA_WIDTH = 80;
-static const size_t VGA_HEIGHT = 10;
+static const size_t VGA_HEIGHT = 20;
 
 static size_t terminal_row;
 static size_t terminal_column;
@@ -38,7 +38,6 @@ void terminal_initialize(void) {
             terminal_buffer[index] = vga_entry(' ', terminal_color);
         }
     }
-    printf("Terminal initiated!\n");
     terminal_input_line();
 }
  

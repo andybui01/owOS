@@ -1,4 +1,4 @@
-#include <kernel/pic.h>
+#include <drivers/pic.h>
 #include <kernel/system.h>
 
 #define MPIC 0x0020
