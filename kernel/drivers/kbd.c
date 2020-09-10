@@ -1,5 +1,5 @@
 #include <drivers/kbd.h>
-#include <kernel/pic.h>
+#include <drivers/pic.h>
 #include <int/regs.h>
 #include <ds.h>
 #include <stdint.h>

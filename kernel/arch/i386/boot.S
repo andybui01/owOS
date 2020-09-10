@@ -26,6 +26,8 @@ stack_top:
 _start:
 	movl $stack_top, %esp
 
+	push %ebx
+
 	# Transfer control to the main kernel.
 	call kernel_main
 
