@@ -10,7 +10,7 @@ extern "C" {
 
 __attribute__((__noreturn__))
 void abort(void);
-void itox(uint64_t, char*);
+char* itoa(uint32_t value, char* buffer, uint32_t base);
 
 #ifdef __cplusplus
 }
