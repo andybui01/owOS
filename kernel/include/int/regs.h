@@ -1,5 +1,5 @@
-#ifndef _COMMON_H
-#define _COMMON_H
+#ifndef _REGS_H
+#define _REGS_H
 
 // Interrupt stack dump
 struct regs {
