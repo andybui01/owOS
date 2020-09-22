@@ -42,6 +42,16 @@ LIBS:=$(LIBS) $(DRIVERS_LIBS)
 ALL_OBJS:=$(ALL_OBJS) \
 $(DRIVERS_OBJS) \
 
+include mem/make.config
+
+CFLAGS:=$(CFLAGS) $(MEM_CFLAGS)
+CPPFLAGS:=$(CPPFLAGS) $(MEM_CPPFLAGS)
+LDFLAGS:=$(LDFLAGS) $(MEM_LDFLAGS)
+LIBS:=$(LIBS) $(MEM_LIBS)
+
+ALL_OBJS:=$(ALL_OBJS) \
+$(MEM_OBJS) \
+
 OBJS=\
 $(ARCHDIR)/crti.o \
 $(ARCHDIR)/crtbegin.o \
