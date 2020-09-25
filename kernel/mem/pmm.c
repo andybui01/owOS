@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <string.h>
+#include <debug.h>
 
 #define MULTIBOOT_MEMORY_AVAILABLE          1
 #define MULTIBOOT_MEMORY_RESERVED           2
@@ -13,7 +14,7 @@
 #define MULTIBOOT_MEMORY_BADRAM             5
 
 uint8_t frame_bitmap[N_FRAMES/8] = {0};
-uint8_t last_index = 0;
+uint32_t last_index = 0;
 
 void pmm_bootstrap(uint32_t mmap_addr, uint32_t mmap_length)
 {
@@ -36,23 +37,23 @@ void pmm_bootstrap(uint32_t mmap_addr, uint32_t mmap_length)
         printf("first faddr: 0x%x\n", faddr);
 
         for (; faddr < addr + len; faddr += PAGE_SIZE) {
-            
+
             // Grab index and offset of bitmap
-            uint8_t index = faddr / PAGE_SIZE;
-            uint32_t off = faddr % 8;
+            uint32_t index = faddr / PAGE_SIZE;
+            uint32_t off = index % 8;
             index /= 8;
+
+            kbreak();
 
             // Set frame status as "available"
             frame_bitmap[index] |= (1 << off);
         }
     }
-
-    printf("0x%x\n", frame_bitmap[0]);
 }
 
 uint32_t pmm_frame_alloc()
 {
-    for (uint8_t index = last_index; index > N_FRAMES / 8; ++index) {
+    for (uint32_t index = last_index; index < N_FRAMES / 8; ++index) {
 
         if (frame_bitmap[index]) {
 
@@ -60,13 +61,15 @@ uint32_t pmm_frame_alloc()
             for (uint8_t off = 0; off < 8; off++) {
 
                 if (frame_bitmap[index] & (1 << off)) {
+                    printf("FRAME before: 0x%x\n", frame_bitmap[index]);
 
                     // Flip the bit
                     frame_bitmap[index] ^= (1 << off);
+                    printf("FRAME after: 0x%x\n", frame_bitmap[index]);
 
                     // Backup index and return frame address
                     last_index = index;
-                    return (index + off) * PAGE_SIZE;
+                    return (index*8 + off) * PAGE_SIZE;
                 }
             }
         }
@@ -77,8 +80,8 @@ uint32_t pmm_frame_alloc()
 
 void pmm_frame_dealloc(uint32_t faddr)
 {
-    uint8_t index = faddr / 8;
-    uint8_t off = faddr % 8;
+    uint32_t index = (faddr / PAGE_SIZE) / 8;
+    uint8_t off = index % 8;
 
     // flip bit
     frame_bitmap[index] ^= (1 << off);
@@ -87,8 +90,8 @@ void pmm_frame_dealloc(uint32_t faddr)
 bool pmm_check_frame(uint32_t faddr)
 {
 
-    uint8_t index = faddr / 8;
-    uint8_t off = faddr % 8;
+    uint32_t index = (faddr / PAGE_SIZE) / 8;
+    uint8_t off = index % 8;
 
     return (frame_bitmap[index] & (1 << off));
 }
