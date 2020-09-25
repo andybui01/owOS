@@ -51,7 +51,7 @@ void pmm_bootstrap(uint32_t mmap_addr, uint32_t mmap_length)
     }
 }
 
-uint32_t pmm_frame_alloc()
+uint32_t pmm_frame_alloc(void)
 {
     for (uint32_t index = last_index; index < N_FRAMES / 8; ++index) {
 

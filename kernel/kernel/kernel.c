@@ -3,14 +3,15 @@
 #include <kernel/idt.h>
 #include <drivers/pic.h>
 #include <drivers/kbd.h>
-#include <kernel/multiboot.h>
-#include <mem/pmm.h>
+#include <boot/multiboot.h>
+#include <mem/mem.h>
 
 #include <stdio.h>
 #include <stdint.h>
 #include <debug.h>
 
-void kernel_main(multiboot_info_t *mbt) {
+void kernel_main(multiboot_info_t *mbt)
+{
 
     // initialize terminal
     terminal_initialize();
@@ -24,7 +25,7 @@ void kernel_main(multiboot_info_t *mbt) {
     // remap PIC
     pic_remap(0x20, 0x28);
 
-    pmm_bootstrap(mbt->mmap_addr, mbt->mmap_length);
+    mem_bootstrap(mbt);
 
     // infinite loop ya!
     for (;;) {
