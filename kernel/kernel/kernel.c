@@ -26,6 +26,21 @@ void kernel_main(multiboot_info_t *mbt) {
 
     pmm_bootstrap(mbt->mmap_addr, mbt->mmap_length);
 
+    uint32_t faddr = pmm_frame_alloc();
+
+    printf("allocated 0x%x\n", faddr);
+
+    if (!pmm_check_frame(faddr)) {
+        printf("frame in use at 0x%x\n", faddr);
+    }
+
+    pmm_frame_dealloc(faddr);
+
+    if (pmm_check_frame(faddr)) {
+        printf("frame NOT in use at 0x%x\n", faddr);
+    }
+
+
     // infinite loop ya!
     for (;;) {
         asm("hlt");
