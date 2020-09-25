@@ -4,6 +4,7 @@
 #include <stdint.h>
 
 #define MAX_PHYSICAL_MEM    0xFFFFFFFF
-#define N_FRAMES            MAX_PHYSICAL_MEM / 0x1000
+#define PAGE_SIZE           0x1000
+#define N_FRAMES            MAX_PHYSICAL_MEM / PAGE_SIZE 
 
 #endif

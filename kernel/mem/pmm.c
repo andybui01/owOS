@@ -13,32 +13,39 @@
 // uint32_t???
 uint8_t frame_bitmap[N_FRAMES/8];
 
-void pmm_bootstrap(uint32_t mmap_addr, uint32_t mmap_length) {
+void pmm_bootstrap(uint32_t mmap_addr, uint32_t mmap_length)
+{
 
     mmap_entry_t *entry = mmap_addr;
 
     uint32_t n = 0;
+    uint32_t n2 = 0;
 
-    while (entry < mmap_addr + mmap_length) {
+    for (; entry < mmap_addr + mmap_length; entry++) {
 
-        uint32_t addr, len, type;
+        if (entry->type != MULTIBOOT_MEMORY_AVAILABLE)
+            continue;
 
-        addr = entry->addr_low;
+        uint32_t addr, len;
+        addr = entry->len_low;
         len = entry->len_low;
-        type = entry->type;
 
-        printf("addr: 0x%x len: 0x%x type: 0x%x\n", addr, len, type);
+        n2 += len / PAGE_SIZE;
 
-        if (type == MULTIBOOT_MEMORY_AVAILABLE) {
-            uint32_t ptr = addr + (0x1000 - (addr % 0x1000)) + 0x1000;
-            // for (; ptr < addr + len; ptr += 0x1000) {
-            // 	++n;
-            // }
-            n += len / 0x1000;
+        uint32_t paddr = ((addr + PAGE_SIZE - 1) & ~(PAGE_SIZE - 1));
+
+        for (; paddr < addr + len; paddr += PAGE_SIZE) {
+            
+            // Grab index and offset of bitmap
+            uint32_t index = paddr / PAGE_SIZE;
+            uint32_t offset = paddr % 8;
+            index /= 8;
+
+            // Set frame status as "available"
+            frame_bitmap[index] &= (1 << offset);
+            n++;
         }
-
-        entry = (mmap_entry_t*) ((unsigned int) entry + entry->size + sizeof(entry->size));
     }
 
-    printf("There are %d/%d frames\n", n, N_FRAMES);
+    printf("There are %d/%d allocated\n", n, n2 );
 }
