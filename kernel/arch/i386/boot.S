@@ -105,7 +105,7 @@ _start:
 	# At this point, paging is fully set up and enabled.
 
 	# Unmap the identity mapping as it is now unnecessary.
-	// movl $0, boot_page_directory + 0
+	movl $0, boot_page_directory + 0
 
 	# Reload crc3 to force a TLB flush so the changes to take effect.
 	movl %cr3, %ecx
@@ -114,7 +114,7 @@ _start:
 	# Set up the stack.
 	movl $stack_top, %esp
 
-	// addl $0xC0000000, %ebx
+	addl $0xC0000000, %ebx
 	push %ebx
 
 	# Enter the high-level kernel.
