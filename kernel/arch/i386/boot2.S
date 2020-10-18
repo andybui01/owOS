@@ -6,7 +6,7 @@
 .set CHECKSUM, -(MAGIC + FLAGS) # checksum of above, to prove we are multiboot
 
 # Declare a multiboot header that marks the program as a kernel.
-.section .multiboot
+.section .multiboot.data
 .align 4
 .long MAGIC
 .long FLAGS
@@ -27,11 +27,10 @@ boot_page_directory:
 	.skip 4096
 boot_page_table1:
 	.skip 4096
-
 # Further page tables may be required if the kernel grows beyond 3 MiB.
 
 # The kernel entry point.
-.section .text
+.section .multiboot.text
 .global _start
 .type _start, @function
 _start:
@@ -52,7 +51,6 @@ _start:
 	# Only map the kernel.
 	cmpl $(_kernel_start - 0xC0000000), %esi
 	jl 2f
-
 	cmpl $(_kernel_end - 0xC0000000), %esi
 	jge 3f
 
@@ -71,7 +69,6 @@ _start:
 	loop 1b
 
 3:
-
 	# Map VGA video memory to 0xC03FF000 as "present, writable".
 	movl $(0x000B8000 | 0x003), boot_page_table1 - 0xC0000000 + 1023 * 4
 
@@ -92,7 +89,7 @@ _start:
 
 	# Enable paging and the write-protect bit.
 	movl %cr0, %ecx
-	orl $0x80000000, %ecx
+	orl $0x80010000, %ecx
 	movl %ecx, %cr0
 
 	# Jump to higher half with an absolute jump. 
@@ -105,16 +102,15 @@ _start:
 	# At this point, paging is fully set up and enabled.
 
 	# Unmap the identity mapping as it is now unnecessary. 
-	// movl $0, boot_page_directory + 0
+	movl $0, boot_page_directory + 0
 
 	# Reload crc3 to force a TLB flush so the changes to take effect.
-	// movl %cr3, %ecx
-	// movl %ecx, %cr3
+	movl %cr3, %ecx
+	movl %ecx, %cr3
 
 	# Set up the stack.
 	movl $stack_top, %esp
 
-	// addl $0xC0000000, %ebx
 	push %ebx
 
 	# Enter the high-level kernel.
@@ -124,3 +120,52 @@ _start:
 	cli
 1:	hlt
 	jmp 1b
+
+
+
+
+
+
+
+
+
+
+    # Declare constants for the multiboot header.
+.set ALIGN,    1<<0             # align loaded modules on page boundaries
+.set MEMINFO,  1<<1             # provide memory map
+.set FLAGS,    ALIGN | MEMINFO  # this is the Multiboot 'flag' field
+.set MAGIC,    0x1BADB002       # 'magic number' lets bootloader find the header
+.set CHECKSUM, -(MAGIC + FLAGS) # checksum of above, to prove we are multiboot
+
+# Declare a header as in the Multiboot Standard.
+.section .multiboot
+.align 4
+.long MAGIC
+.long FLAGS
+.long CHECKSUM
+
+# Reserve a stack for the initial thread.
+.section .bss
+.align 16
+stack_bottom:
+.skip 16384 # 16 KiB
+stack_top:
+
+# The kernel entry point.
+.section .text
+.global _start
+.type _start, @function
+_start:
+	movl $stack_top, %esp
+
+	push %ebx
+
+	# Transfer control to the main kernel.
+	call kernel_main
+
+	# Hang if kernel_main unexpectedly returns.
+	cli
+hang:
+	hlt
+	jmp hang
+.size _start, . - _start

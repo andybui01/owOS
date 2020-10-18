@@ -13,43 +13,6 @@ idt_ptr_t ip;
 // table for C-level fault handlers
 irq_handler_t handlers[256] = {0};
 
-static const char *exception_messages[34] = {
-	"Division by zero",
-	"Debug",
-	"Non-maskable interrupt",
-	"Breakpoint",
-	"Detected overflow",
-	"Out-of-bounds",
-	"Invalid opcode",
-	"No coprocessor",
-	"Double fault",
-	"Coprocessor segment overrun",
-	"Bad TSS",
-	"Segment not present",
-	"Stack fault",
-	"General protection fault",
-	"Page fault",
-	"Unknown interrupt",
-	"Coprocessor fault",
-	"Alignment check",
-	"Machine check",
-	"Reserved",
-	"Reserved",
-	"Reserved",
-	"Reserved",
-	"Reserved",
-	"Reserved",
-	"Reserved",
-	"Reserved",
-	"Reserved",
-	"Reserved",
-	"Reserved",
-	"Reserved",
-	"Reserved",
-	"Timer",
-	"Keyboard"
-};
-
 void idt_bootstrap() {
     ip.base = (uintptr_t)&idt;
     ip.limit = (sizeof(idt_gate_t) * 256) - 1;

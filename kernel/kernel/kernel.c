@@ -3,28 +3,40 @@
 #include <kernel/idt.h>
 #include <drivers/pic.h>
 #include <drivers/kbd.h>
-#include <kernel/multiboot.h>
-#include <mem/pmm.h>
+#include <boot/multiboot.h>
+#include <mem/mem.h>
 
 #include <stdio.h>
 #include <stdint.h>
 #include <debug.h>
 
-void kernel_main(multiboot_info_t *mbt) {
+extern uint32_t _kernel_end;
+
+void kernel_main(multiboot_info_t *mbt)
+{
 
     // initialize terminal
     terminal_initialize();
+    printf("hi\n");
+
+
+    // mem_bootstrap(mbt);
 
     // initialize GDT
     gdt_bootstrap();
 
     // initialize IDT
     idt_bootstrap();
+    
+    kbreak();
+    // printf("0x%x\n", mbt->mmap_addr);
+    printf("kernel ends at: 0x%x\n", _kernel_end);
+    int a = 5/0;
+    (void) a;
+
 
     // remap PIC
     pic_remap(0x20, 0x28);
-
-    pmm_bootstrap(mbt->mmap_addr, mbt->mmap_length);
 
     // infinite loop ya!
     for (;;) {
