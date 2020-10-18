@@ -1,0 +1,37 @@
+_kernel_start = 0xC0100000
+
+stack_bottom
+stack_top
+boot_page_directory
+boot_page_table1
+
+_kernel_end = .
+
+
+start:
+    edi = (uint32_t) boot_page_table1 - 0xC0000000
+    esi = 0
+    ecx = 1023
+
+1:
+    // if esi isnt start of kernel mem, continue searching
+    if (esi < _kernel_start - 0xC0000000)
+        goto 2f;
+
+    // if finish mapping kernel mem
+    if (esi >= _kernel_end - 0xC0000000)
+        goto 3f;
+
+    // do this before reaching end of kernel
+    edx = esi
+    edx = edx | 0b11
+    *edi = edx // table[i] |= 0b11 present, writable
+
+2:
+    esi += 4096
+    edi += 4
+    ecx -= 1
+    if (ecx != 0)
+        goto 1b
+
+3: ...
