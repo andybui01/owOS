@@ -2,7 +2,8 @@
 #include <stdint.h>
 #include <stdio.h>
 
-void phex(uint64_t number) {
+void phex(uint64_t number) 
+{
 
     int nibble;
     int start = 0;

@@ -104,7 +104,8 @@ unsigned char sc_qwerty_shifted[128] = {
 // flags
 uint8_t shift_flag = 0;
 
-void keyboard_handler(regs_t *r) {
+void keyboard_handler(regs_t *r) 
+{
     (void) r;
     uint8_t scan_code = pic_scan_code();
 

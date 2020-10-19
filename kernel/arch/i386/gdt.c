@@ -6,7 +6,8 @@
 gdt_entry_t gdt[3];
 gdt_ptr_t gp;
 
-void gdt_bootstrap() {
+void gdt_bootstrap() 
+{
 	
 	// Set up GDT pointer and limit
 	gp.limit = (sizeof(gdt_entry_t) * 3) - 1;
@@ -35,7 +36,8 @@ void gdt_bootstrap() {
 }
 
 // Create a GDT descriptor
-void gdt_create_desc(int num, uint32_t base, uint32_t limit, uint8_t access, uint8_t gran) {
+void gdt_create_desc(int num, uint32_t base, uint32_t limit, uint8_t access, uint8_t gran) 
+{
 
 	// Set the descriptor base address
 	gdt[num].base_low = (base & 0xFFFF);

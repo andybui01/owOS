@@ -4,7 +4,8 @@
 // Original work: https://github.com/goToMain/c-utils
 // Author: Siddharth Chandrasekaran, https://embedjournal.com
 
-int circ_bbuf_push(circ_bbuf_t *c, uint8_t data) {
+int circ_bbuf_push(circ_bbuf_t *c, uint8_t data) 
+{
     int next;
 
     next = c->head + 1;  // next is where head will point to after this write.
@@ -19,7 +20,8 @@ int circ_bbuf_push(circ_bbuf_t *c, uint8_t data) {
     return 0;  // return success to indicate successful push.
 }
 
-int circ_bbuf_pop(circ_bbuf_t *c, uint8_t *data) {
+int circ_bbuf_pop(circ_bbuf_t *c, uint8_t *data) 
+{
     int next;
 
     if (c->head == c->tail)  // if the head == tail, we don't have any data

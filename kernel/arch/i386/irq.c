@@ -7,7 +7,8 @@
 
 extern void keyboard_handler(regs_t *);
 
-void irq_install_handlers(void) {
+void irq_install_handlers(void) 
+{
     irq_handler_t handler;
 
     handler = &keyboard_handler;

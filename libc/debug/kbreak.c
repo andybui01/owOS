@@ -1,5 +1,6 @@
 #include <debug.h>
 
-void kbreak() {
+void kbreak() 
+{
     return;
 }

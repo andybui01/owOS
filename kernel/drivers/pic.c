@@ -34,7 +34,8 @@
     uint8_t offset_s:   new offset for slave PIC, vectors on the slave PIC
                         will become offset_s .. offset_s + 7
 */
-void pic_remap(uint8_t offset_m, uint8_t offset_s) {
+void pic_remap(uint8_t offset_m, uint8_t offset_s) 
+{
     
     // backup masks
     uint8_t backup_m = inb(MPIC_DATA);
@@ -81,13 +82,15 @@ void pic_remap(uint8_t offset_m, uint8_t offset_s) {
 }
 
 // OCW2 - signal EOI
-void pic_send_eoi(uint8_t irq) {
+void pic_send_eoi(uint8_t irq) 
+{
     if (irq >= 8)
         outb(SPIC_COMMAND, PIC_EOI);
     outb(MPIC_COMMAND, PIC_EOI);
 }
 
-void irq_set_mask(uint8_t irq) {
+void irq_set_mask(uint8_t irq) 
+{
     uint16_t port;
     uint8_t value;
  
@@ -101,7 +104,8 @@ void irq_set_mask(uint8_t irq) {
     outb(port, value);        
 }
  
-void irq_clear_mask(uint8_t irq) {
+void irq_clear_mask(uint8_t irq) 
+{
     uint16_t port;
     uint8_t value;
  
@@ -115,6 +119,7 @@ void irq_clear_mask(uint8_t irq) {
     outb(port, value);        
 }
 
-uint8_t pic_scan_code() {
+uint8_t pic_scan_code() 
+{
     return inb(0x60);
 }

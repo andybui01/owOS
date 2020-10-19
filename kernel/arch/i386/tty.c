@@ -17,7 +17,8 @@ static uint8_t terminal_color;
 static uint16_t* terminal_buffer;
 static bool terminal_overwrite;
 
-void terminal_input_line() {
+void terminal_input_line() 
+{
 	const char* data = ">_";
 	size_t size = strlen(data);
 	for(size_t i = 0; i < size; i++) {
@@ -26,7 +27,8 @@ void terminal_input_line() {
 	}
 }
 
-void terminal_initialize(void) {
+void terminal_initialize(void) 
+{
 	terminal_overwrite = false;
 	terminal_row = 0;
 	terminal_column = 0;
@@ -43,19 +45,21 @@ void terminal_initialize(void) {
 	terminal_input_line();
 }
 
-void terminal_setcolor(uint8_t color) {
+void terminal_setcolor(uint8_t color) 
+{
 	terminal_color = color;
 }
 
-void terminal_clearline(size_t y) {
+void terminal_clearline(size_t y) 
+{
 	for(size_t i = 0; i < VGA_WIDTH; i++) {
 		const size_t index = y * VGA_WIDTH + i;
 		terminal_buffer[index] = vga_entry(' ', terminal_color);
 	}
 }
 
-void terminal_scroll(size_t row) {
-
+void terminal_scroll(size_t row) 
+{
 	// If next row is the limit
 	if (++row >= VGA_HEIGHT - 1) {
 
@@ -82,7 +86,8 @@ void terminal_scroll(size_t row) {
 	terminal_clearline(terminal_row);
 }
 
-void terminal_putentryat(char c, uint8_t color, size_t x, size_t y) {
+void terminal_putentryat(char c, uint8_t color, size_t x, size_t y) 
+{
 	// Check if newline character
 	if (c == '\n') {
 		terminal_column = -1;
@@ -94,7 +99,8 @@ void terminal_putentryat(char c, uint8_t color, size_t x, size_t y) {
 	terminal_buffer[index] = vga_entry(c, color);
 }
 
-void terminal_putchar(char c) {
+void terminal_putchar(char c) 
+{
 	terminal_putentryat(c, terminal_color, terminal_column, terminal_row);
 	if (++terminal_column == VGA_WIDTH) {
 		terminal_column = 0;
@@ -102,12 +108,14 @@ void terminal_putchar(char c) {
 	}
 }
 
-void terminal_write(const char* data, size_t size) {
+void terminal_write(const char* data, size_t size) 
+{
 	for (size_t i = 0; i < size; i++)
 		terminal_putchar(data[i]);
 }
 
-void terminal_writestring(const char* data) {
+void terminal_writestring(const char* data) 
+{
 	terminal_write(data, strlen(data));
 	terminal_input_line();
 }
