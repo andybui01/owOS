@@ -43,26 +43,26 @@ _start:
     // Map 1024 pages
     movl $1024, %ecx
 
-1:
-    // Map until the end of the kernel (MAP ALL 1024 PAGES!!)
-    cmpl $V2P_WO(_kernel_end), %esi
-    jge 3f
-
+.page_table_loop:
     // Map physical address as "present, writable". Note that this maps
     // .text and .rodata as writable. Mind security and map them as non-writable.
     movl %esi, %edx
     orl $(PTE_PRESENT | PTE_WRITABLE), %edx
     movl %edx, (%edi)
 
-2:
     // Size of page is 4096 bytes.
     addl $4096, %esi
     // Size of entries in boot_page_table1 is 4 bytes.
     addl $4, %edi
-    // Loop to the next entry if we haven't finished.
-    loop 1b
 
-3:
+    // Map until the end of the kernel (OR MAP ALL 1024 PAGES!!)
+    // cmpl $V2P_WO(_kernel_end), %esi
+    // jge 3f
+
+    // Loop to the next entry if we haven't finished.
+    loop .page_table_loop
+
+
     // Map the page table to both virtual addresses 0x00000000 and 0xC0000000.
     movl $V2P_WO(boot_page_table1), %ecx
     orl $(PDE_PRESENT | PDE_WRITABLE), %ecx
@@ -80,12 +80,12 @@ _start:
     movl %ecx, %cr0
 
     // Jump to higher half with an absolute jump.
-    lea 4f, %ecx
+    lea 1f, %ecx
     jmp *%ecx
 
 .section .text
 
-4:
+1:
     // At this point, paging is fully set up and enabled.
     // Unmap the identity mapping as it is now unnecessary.
     movl $0, boot_page_directory + 0
@@ -106,5 +106,5 @@ _start:
 
     // Infinite loop if the system has nothing more to do.
     cli
-1:	hlt
-    jmp 1b
+2:	hlt
+    jmp 2b
