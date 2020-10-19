@@ -31,7 +31,6 @@ ALL_OBJS=\
 $(KERNEL_ARCH_OBJS) \
 kernel/kernel.o \
 
-
 include drivers/make.config
 
 CFLAGS:=$(CFLAGS) $(DRIVERS_CFLAGS)
@@ -77,6 +76,9 @@ owos.kernel: $(OBJS) $(ARCHDIR)/linker.ld
 	$(CC) -T $(ARCHDIR)/linker.ld -o $@ $(CFLAGS) $(LINK_LIST)
 	grub-file --is-x86-multiboot owos.kernel
 
+$(ARCHDIR)/linker.ld:
+	$(CC) -E -x c $(CFLAGS) $(CPPFLAGS) $(ARCHDIR)/linker.ldS | grep -v '^#' >> $(ARCHDIR)/linker.ld
+
 $(ARCHDIR)/crtbegin.o $(ARCHDIR)/crtend.o:
 	OBJ=`$(CC) $(CFAGS) $(LDFLAGS) -print-file-name=$(@F)` && cp "$$OBJ" $@
 
@@ -90,6 +92,7 @@ clean:
 	rm -f owos.kernel
 	rm -f $(OBJS) *.o */*.o */*/*.o
 	rm -f $(OBJS:.o=.d) *.d */*.d */*/*.d
+	rm -f */*/*.ld
 
 install: install-headers install-kernel
 

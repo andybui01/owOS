@@ -19,21 +19,11 @@ void kernel_main(multiboot_info_t *mbt)
     terminal_initialize();
     printf("hi\n");
 
-
-    // mem_bootstrap(mbt);
-
     // initialize GDT
     gdt_bootstrap();
 
     // initialize IDT
     idt_bootstrap();
-
-    printf("0x%x\n", mbt);
-    printf("0x%x\n", mbt->mmap_addr);
-    // printf("kernel ends at: 0x%x\n", _kernel_end);
-    // int a = 5/0;
-    // (void) a;
-
 
     // remap PIC
     pic_remap(0x20, 0x28);
