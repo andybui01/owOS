@@ -20,9 +20,9 @@ void pmm_bootstrap(uint32_t mmap_addr, uint32_t mmap_length)
 {
     // memset(frame_bitmap, 0, sizeof(frame_bitmap));
 
-    mmap_entry_t *entry = mmap_addr;
+    mmap_entry_t *entry = (mmap_entry_t *) mmap_addr;
 
-    for (; entry < mmap_addr + mmap_length; entry++) {
+    for (; (uint32_t) entry < mmap_addr + mmap_length; entry++) {
 
         if (entry->type != MULTIBOOT_MEMORY_AVAILABLE)
             continue;
