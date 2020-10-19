@@ -1,5 +1,5 @@
-#ifndef _MEM_H
-#define _MEM_H
+#ifndef _MEM_MEM_H
+#define _MEM_MEM_H
 
 #include <stdint.h>
 #include <boot/multiboot.h>
