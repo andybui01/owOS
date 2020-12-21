@@ -22,8 +22,10 @@ void pmm_bootstrap(uint32_t mmap_addr, uint32_t mmap_length)
 
     mmap_entry_t *entry = (mmap_entry_t *) mmap_addr;
 
+
     for (; (uint32_t) entry < mmap_addr + mmap_length; entry++) {
 
+        printf("addr: 0x%x len: 0x%x type: 0x%x\n", entry->addr_low, entry->len_low, entry->type);
         if (entry->type != MULTIBOOT_MEMORY_AVAILABLE)
             continue;
 
@@ -31,10 +33,7 @@ void pmm_bootstrap(uint32_t mmap_addr, uint32_t mmap_length)
         addr = entry->len_low;
         len = entry->len_low;
 
-        printf("addr: 0x%x\n", addr);
-
         uint32_t faddr = FRAME_ADDR(addr);
-        printf("first faddr: 0x%x\n", faddr);
 
         for (; faddr < addr + len; faddr += PAGE_SIZE) {
 
@@ -42,8 +41,6 @@ void pmm_bootstrap(uint32_t mmap_addr, uint32_t mmap_length)
             uint32_t index = faddr / PAGE_SIZE;
             uint32_t off = index % 8;
             index /= 8;
-
-            kbreak();
 
             // Set frame status as "available"
             frame_bitmap[index] |= (1 << off);
@@ -61,11 +58,9 @@ uint32_t pmm_frame_alloc(void)
             for (uint8_t off = 0; off < 8; off++) {
 
                 if (frame_bitmap[index] & (1 << off)) {
-                    printf("FRAME before: 0x%x\n", frame_bitmap[index]);
 
                     // Flip the bit
                     frame_bitmap[index] ^= (1 << off);
-                    printf("FRAME after: 0x%x\n", frame_bitmap[index]);
 
                     // Backup index and return frame address
                     last_index = index;
@@ -75,7 +70,7 @@ uint32_t pmm_frame_alloc(void)
         }
     }
 
-    return 0;
+    return -1;
 }
 
 void pmm_frame_dealloc(uint32_t faddr)

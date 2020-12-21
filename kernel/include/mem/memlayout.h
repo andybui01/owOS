@@ -6,8 +6,8 @@
 
 #define KMEM_LINK (KMEM_BASE + KMEM_GRUB)
 
-#define V2P(x) (((uintptr_t) (x) - KMEM_BASE))
-#define P2V(x) ((void *)((uintptr_t) (x) + KMEM_BASE))
+#define V2P(x) (((uint32_t) (x) - KMEM_BASE))
+#define P2V(x) ((void *)((uint32_t) (x) + KMEM_BASE))
 
 #define V2P_WO(x) ((x) - KMEM_BASE)
 #define P2V_WO(x) ((x) + KMEM_BASE)

@@ -25,5 +25,5 @@ SECTIONS
 		*(.bss)
 		*(.bootstrap_stack)
 	}
-	_kernel_end = .;
+	_kernel_end = ALIGN(4K);
 }

@@ -21,4 +21,17 @@
 #define PTE_PAT_BIT_3      0x080
 #define PTE_GLOBAL         0x100
 
+#ifndef __ASSEMBLER__
+
+#include <stdbool.h>
+#include <mem/pagetable.h>
+#include <types.h>
+
+void paging_bootstrap();
+bool page_alloc(pte_t *pte);
+void page_free(pte_t *pte);
+void map_addr(vaddr_t vaddr);
+
+#endif
+
 #endif

@@ -17,7 +17,6 @@ void kernel_main(multiboot_info_t *mbt)
 
     // initialize terminal
     terminal_initialize();
-    printf("hi\n");
 
     // initialize GDT
     gdt_bootstrap();

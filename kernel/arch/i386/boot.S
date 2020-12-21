@@ -24,12 +24,13 @@ stack_top:
 // Preallocate pages used for paging. Don't hard-code addresses and assume they
 // are available, as the bootloader might have loaded its multiboot structures or
 // modules there. This lets the bootloader know it must avoid the addresses.
-.section .bss, "aw", @nobits
+.section .data, "aw"
     .align 4096
+.global boot_page_directory
 boot_page_directory:
-    .skip 4096
+    .fill 1024, 4, 0
 boot_page_table1:
-    .skip 4096
+    .fill 1024, 4, 0
 // Add more as necessary
 
 // The kernel entry point.
@@ -60,6 +61,7 @@ _start:
     // jge 3f
 
     // Loop to the next entry if we haven't finished.
+    // this will continue until ecx = 0
     loop .page_table_loop
 
 
