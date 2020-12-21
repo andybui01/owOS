@@ -9,7 +9,6 @@
 
 pgd_t *curr_dir;
 
-extern vaddr_t _kernel_end;
 
 // Bootstrap paging mechanism
 void paging_bootstrap()
@@ -25,7 +24,6 @@ void paging_bootstrap()
     // print 768th entry, which has our higher half kernel right now
     // printf("entry 768: 0x%x\n", curr_dir->entries[768]);
 
-    printf("Kernel ends at 0x%x\n", (&_kernel_end));
 
     paddr_t table_addr = curr_dir->entries[768].addr << 12;
 

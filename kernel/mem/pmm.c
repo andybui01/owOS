@@ -1,6 +1,8 @@
 #include <mem/pmm.h>
 #include <mem/mem.h>
+#include <mem/memlayout.h>
 
+#include <types.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdbool.h>
@@ -13,29 +15,50 @@
 #define MULTIBOOT_MEMORY_NVS                4
 #define MULTIBOOT_MEMORY_BADRAM             5
 
+
+// kernel start and end addresses
+extern uint32_t _kernel_start, _kernel_end;
+static vaddr_t kstart_addr = &_kernel_start;
+static vaddr_t kend_addr = &_kernel_end;
+
 uint8_t frame_bitmap[N_FRAMES/8] = {0};
 uint32_t last_index = 0;
 
 void pmm_bootstrap(uint32_t mmap_addr, uint32_t mmap_length)
 {
-    // memset(frame_bitmap, 0, sizeof(frame_bitmap));
+    paddr_t kstart_pg = PG_ALIGN_DOWN(V2P(kstart_addr));
+    paddr_t kend_pg = PG_ALIGN(V2P(kend_addr));
 
     mmap_entry_t *entry = (mmap_entry_t *) mmap_addr;
 
+    // skip first entry because its the GRUB reserved area
+    entry++;
 
     for (; (uint32_t) entry < mmap_addr + mmap_length; entry++) {
 
-        printf("addr: 0x%x len: 0x%x type: 0x%x\n", entry->addr_low, entry->len_low, entry->type);
         if (entry->type != MULTIBOOT_MEMORY_AVAILABLE)
             continue;
 
         uint32_t addr, len;
-        addr = entry->len_low;
+        addr = entry->addr_low;
         len = entry->len_low;
 
-        uint32_t faddr = FRAME_ADDR(addr);
+        // if region exists in kernel's locaton, skip
+        if (addr >= kstart_pg && (addr + len) < kend_pg)
+            continue;
+
+        printf("kstart: 0x%x kend: 0x%x\n", kstart_pg, kend_pg);
+        printf("addr: 0x%x len: 0x%x type: 0x%x\n", entry->addr_low, entry->len_low, entry->type);
+
+        uint32_t faddr = PG_ALIGN(addr);
 
         for (; faddr < addr + len; faddr += PAGE_SIZE) {
+
+            // if region is at kstart, skip to kend
+            if (faddr == kstart_pg) {
+                faddr = kend_pg - PAGE_SIZE;
+                continue;
+            }
 
             // Grab index and offset of bitmap
             uint32_t index = faddr / PAGE_SIZE;
