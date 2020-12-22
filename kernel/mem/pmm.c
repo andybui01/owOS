@@ -82,7 +82,7 @@ uint32_t pmm_frame_alloc(void)
 
                 if (frame_bitmap[index] & (1 << off)) {
 
-                    // Flip the bit
+                    // Set bit to 0
                     frame_bitmap[index] ^= (1 << off);
 
                     // Backup index and return frame address
@@ -101,8 +101,8 @@ void pmm_frame_dealloc(uint32_t faddr)
     uint32_t index = (faddr / PAGE_SIZE) / 8;
     uint8_t off = index % 8;
 
-    // flip bit
-    frame_bitmap[index] ^= (1 << off);
+    // set bit to 1
+    frame_bitmap[index] |= (1 << off);
 }
 
 bool pmm_check_frame(uint32_t faddr)
