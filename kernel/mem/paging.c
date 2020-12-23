@@ -6,6 +6,7 @@
 #include <types.h>
 #include <debug.h>
 #include <stdbool.h>
+#include <string.h>
 
 pgd_t *curr_dir;
 
@@ -22,12 +23,11 @@ void paging_bootstrap()
     // set current page directory to the one at end of memory
     curr_dir = (pgd_t *) PAGE_DIR_RESERVE;
 
-    printf("in paging\n");
-
     // trigger page fault
     uint32_t *ptr = (uint32_t *) 0x1000;
-    map_page((vaddr_t) ptr);
+    map_page((vaddr_t) 0x1000); // this line should make 0x1000 usable mem
     uint32_t trigger = *ptr;
+    printf("Paging enabled...\n");
 }
 
 // alloc a physical frame to a virtual page
@@ -60,6 +60,9 @@ void map_page(vaddr_t vaddr)
     // get index of page table
     uint16_t i = PAGE_DIR_INDEX(vaddr);
 
+    // address of page table
+    vaddr_t pgt_addr = (vaddr_t) (PAGE_TABLES_RESERVE + i*0x1000);
+
     // if page table not present
     if (!curr_dir->entries[i].present) {
 
@@ -67,7 +70,7 @@ void map_page(vaddr_t vaddr)
         paddr_t pgt_frame = pmm_frame_alloc();
 
         // map PDE to the physical frame we allocated
-        curr_dir->entries[i].entry = (pgt_frame | PDE_WRITABLE | PDE_ACCESSED);
+        curr_dir->entries[i].entry = (pgt_frame | PDE_PRESENT | PDE_WRITABLE);
 
         // The PGD acts as a page table for the very last 4MiB area
         // of the address space. Hence, mapping a PDE to a frame in the PGD
@@ -75,12 +78,14 @@ void map_page(vaddr_t vaddr)
         // since all the page tables are in the last 4MiB area.
 
         tlb_flush();
+
+        // zero out the entire table
+        memset(pgt_addr, 0, sizeof(pgt_t));
     }
 
     // At this point we can assume there is a page table for the vaddr.
 
-    // retrieve page table
-    uint32_t pgt_addr = PAGE_TABLES_RESERVE + i*0x1000;
+    // get table
     pgt_t *table = (pgt_t *) pgt_addr;
 
     // allocate frame for new page
