@@ -47,12 +47,16 @@ void pmm_bootstrap(uint32_t mmap_addr, uint32_t mmap_length)
         if (addr >= kstart_pg && (addr + len) < kend_pg)
             continue;
 
-        printf("kstart: 0x%x kend: 0x%x\n", kstart_pg, kend_pg);
-        printf("addr: 0x%x len: 0x%x type: 0x%x\n", entry->addr_low, entry->len_low, entry->type);
+        // printf("kstart: 0x%x kend: 0x%x\n", kstart_pg, kend_pg);
+        // printf("addr: 0x%x len: 0x%x type: 0x%x\n", entry->addr_low, entry->len_low, entry->type);
 
         uint32_t faddr = PG_ALIGN(addr);
 
         for (; faddr < addr + len; faddr += PAGE_SIZE) {
+
+            // skip if we're starting on 1MiB mark
+            if (faddr == 0x100000)
+                continue;
 
             // if region is at kstart, skip to kend
             if (faddr == kstart_pg) {

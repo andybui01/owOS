@@ -6,6 +6,9 @@
 
 #define KMEM_LINK (KMEM_BASE + KMEM_GRUB)
 
+#define PAGE_TABLES_RESERVE 0xFFC00000
+#define PAGE_DIR_RESERVE    0xFFFFF000
+
 #define V2P(x) (((uint32_t) (x) - KMEM_BASE))
 #define P2V(x) ((void *)((uint32_t) (x) + KMEM_BASE))
 

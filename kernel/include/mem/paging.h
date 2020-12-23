@@ -30,7 +30,16 @@
 void paging_bootstrap();
 bool page_alloc(pte_t *pte);
 void page_free(pte_t *pte);
-void map_addr(vaddr_t vaddr);
+void map_page(vaddr_t vaddr);
+
+
+#define PAGE_INDEX_MASK 0x3ff
+
+#define PAGE_DIR_INDEX(x) (((uint32_t)(x) >> 22) & PAGE_INDEX_MASK)
+#define PAGE_TABLE_INDEX(x) (((uint32_t)(x) >> 12) & PAGE_INDEX_MASK)
+
+#define PAGE_DIR_INDEX_WO(x) (((x) >> 22) & PAGE_INDEX_MASK)
+#define PAGE_TABLE_INDEX_WO(x) (((x) >> 12) & PAGE_INDEX_MASK)
 
 #endif
 

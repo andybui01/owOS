@@ -72,6 +72,12 @@ _start:
     movl %ecx, V2P_WO(boot_page_directory) + 0
     movl %ecx, V2P_WO(boot_page_directory) + 768 * 4
 
+    // Make boot_page_directory the last page table
+    movl $V2P_WO(boot_page_directory), %ecx
+    orl $(PDE_PRESENT | PDE_WRITABLE), %ecx
+    movl %ecx, V2P_WO(boot_page_directory) + 1023 * 4
+
+
     // Set cr3 to the address of the boot_page_directory.
     movl $V2P_WO(boot_page_directory), %ecx
     movl %ecx, %cr3

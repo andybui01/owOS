@@ -9,33 +9,25 @@
 
 pgd_t *curr_dir;
 
+// flush tlb entry CURRENTLY FLUSHES ENTIRE TLB CHANGE TO INVLPG
+static inline void tlb_flush(void)
+{
+    asm volatile(   "movl %cr3, %ecx;"
+                    "movl %ecx, %cr3");
+}
 
 // Bootstrap paging mechanism
 void paging_bootstrap()
 {
+    // set current page directory to the one at end of memory
+    curr_dir = (pgd_t *) PAGE_DIR_RESERVE;
 
-    // load cr3 address into C, cr3 register holds page directory address
-    paddr_t cr3;
-    asm volatile("mov %%cr3, %0" : "=r"(cr3));
+    printf("in paging\n");
 
-    // set current page directory to the one we established in boot.S
-    curr_dir = P2V(cr3);
-
-    // print 768th entry, which has our higher half kernel right now
-    // printf("entry 768: 0x%x\n", curr_dir->entries[768]);
-
-
-    paddr_t table_addr = curr_dir->entries[768].addr << 12;
-
-    // printf("table at 0x%x\n", table_addr);
-
-    pgt_t *table = P2V(table_addr);
-
-    printf("0x%x\n", table->entries[0]);
-    printf("first: 0x%x last: 0x%x\n", table->entries[0], table->entries[1023]);
-
-
-    return;
+    // trigger page fault
+    uint32_t *ptr = (uint32_t *) 0x1000;
+    map_page((vaddr_t) ptr);
+    uint32_t trigger = *ptr;
 }
 
 // alloc a physical frame to a virtual page
@@ -48,7 +40,7 @@ bool page_alloc(pte_t *pte)
         return false;
 
     // map page to frame
-    pte->addr = p >> 12;
+    pte->addr = p >> 12; //?????
     pte->present = 1;
 
     return true;
@@ -57,25 +49,43 @@ bool page_alloc(pte_t *pte)
 // free frame from page and invalidate page
 void page_free(pte_t *pte)
 {
-    paddr_t p = pte->addr << 12;
+    paddr_t p = pte->addr << 12;//??????
     pmm_frame_dealloc(p);
     pte->present = 0;
 }
 
 // map page-aligned virtual address to  physical address
-void map_addr(vaddr_t vaddr)
+void map_page(vaddr_t vaddr)
 {
-    // attempt to retrieve page table
-    pde_t pde = curr_dir->entries[PAGE_DIR_INDEX(vaddr)];
+    // get index of page table
+    uint16_t i = PAGE_DIR_INDEX(vaddr);
 
     // if page table not present
-    if (!pde.present) {
+    if (!curr_dir->entries[i].present) {
 
         // allocate frame for new page table
-        paddr_t p = pmm_frame_alloc();
+        paddr_t pgt_frame = pmm_frame_alloc();
 
+        // map PDE to the physical frame we allocated
+        curr_dir->entries[i].entry = (pgt_frame | PDE_WRITABLE | PDE_ACCESSED);
+
+        // The PGD acts as a page table for the very last 4MiB area
+        // of the address space. Hence, mapping a PDE to a frame in the PGD
+        // is akin to mapping the page of the page table ITSELF to the frame,
+        // since all the page tables are in the last 4MiB area.
+
+        tlb_flush();
     }
 
+    // At this point we can assume there is a page table for the vaddr.
 
-    return;
+    // retrieve page table
+    uint32_t pgt_addr = PAGE_TABLES_RESERVE + i*0x1000;
+    pgt_t *table = (pgt_t *) pgt_addr;
+
+    // allocate frame for new page
+    paddr_t frame = pmm_frame_alloc();
+    table->entries[PAGE_TABLE_INDEX(vaddr)].entry = (frame | PTE_PRESENT | PTE_WRITABLE);
+
+    tlb_flush();
 }

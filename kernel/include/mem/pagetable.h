@@ -56,12 +56,4 @@ typedef struct page_table pgt_t;
 typedef struct page_directory_entry pde_t;
 typedef struct page_table_entry pte_t;
 
-#define PAGE_INDEX_MASK 0x3ff
-
-#define PAGE_DIR_INDEX(x) (((uint32_t)(x) >> 22) & PAGE_INDEX_MASK)
-#define PAGE_TABLE_INDEX(x) (((uint32_t)(x) >> 12) & PAGE_INDEX_MASK)
-
-#define PAGE_DIR_INDEX_WO(x) (((x) >> 22) & PAGE_INDEX_MASK)
-#define PAGE_TABLE_INDEX_WO(x) (((x) >> 12) & PAGE_INDEX_MASK)
-
 #endif
