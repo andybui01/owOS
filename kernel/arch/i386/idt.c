@@ -6,6 +6,8 @@
 #include <stdio.h>
 #include <string.h>
 
+// TODO: Remove magic numbers
+
 // interrupt descriptor table
 idt_gate_t idt[256];
 idt_ptr_t ip;
@@ -13,11 +15,11 @@ idt_ptr_t ip;
 // table for C-level fault handlers
 irq_handler_t handlers[256] = {0};
 
-void idt_bootstrap() 
+void idt_bootstrap()
 {
     ip.base = (uintptr_t)&idt;
     ip.limit = (sizeof(idt_gate_t) * 256) - 1;
-    
+
     // Create empty table
     memset(&idt, 0, sizeof(idt));
 
@@ -26,17 +28,20 @@ void idt_bootstrap()
 	isrs_install();
 }
 
-void isrs_install() 
+void isrs_install()
 {
+	// For full list of exceptions visit: https://wiki.osdev.org/Exceptions
+	// TODO: fix magic numbers, separate type_attr and create more struct variables for idt_gate
 	idt_create_gate(0, (uint32_t) &_isr0, 0x08, 0x8E);
 	idt_create_gate(1, (uint32_t) &_isr1, 0x08, 0x8E);
+	idt_create_gate(14, (uint32_t) &_isr14, 0x08, 0x8E);
 	idt_create_gate(32, (uint32_t) &_isr32, 0x08, 0x8E);
 	idt_create_gate(33, (uint32_t) &_isr33, 0x08, 0x8E);
 
 	irq_install_handlers();
 }
 
-void idt_create_gate(int num, uint32_t offset, uint16_t selector, uint8_t type_attr) 
+void idt_create_gate(int num, uint32_t offset, uint16_t selector, uint8_t type_attr)
 {
 
     idt[num].offset_1 = (offset & 0xFFFF);
@@ -49,19 +54,18 @@ void idt_create_gate(int num, uint32_t offset, uint16_t selector, uint8_t type_a
     idt[num].type_attr = type_attr | 0x60; // force to ring 0: change later
 }
 
-void isr_install_handler(int index, irq_handler_t handler) 
+void isr_install_handler(int index, irq_handler_t handler)
 {
 	handlers[index] = handler;
 }
 
-void isr_uninstall_handler(int index) 
+void isr_uninstall_handler(int index)
 {
 	handlers[index] = 0;
 }
 
-void fault_handler(regs_t *r) 
+void fault_handler(regs_t *r)
 {
-
 	irq_handler_t handler = handlers[r->int_no];
 
 	if (handler) {

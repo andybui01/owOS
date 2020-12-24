@@ -26,11 +26,13 @@
 #include <stdbool.h>
 #include <mem/pagetable.h>
 #include <types.h>
+#include <int/regs.h>
 
 void paging_bootstrap();
 bool page_alloc(pte_t *pte);
 void page_free(pte_t *pte);
 void map_page(vaddr_t vaddr);
+void page_fault_handler(regs_t *r);
 
 
 #define PAGE_INDEX_MASK 0x3ff
@@ -40,6 +42,17 @@ void map_page(vaddr_t vaddr);
 
 #define PAGE_DIR_INDEX_WO(x) (((x) >> 22) & PAGE_INDEX_MASK)
 #define PAGE_TABLE_INDEX_WO(x) (((x) >> 12) & PAGE_INDEX_MASK)
+
+
+#define PF_ERR_PRESENT  0x1
+#define PF_ERR_WRITE    0x2
+#define PF_ERR_USER     0x4
+#define PF_ERR_RESERVED 0x8
+#define PF_ERR_FETCH    0x10
+
+#define pf_err_not_present(x)   (x & PF_ERR_PRESENT)
+#define pf_err_was_write(x)         (x & PF_ERR_WRITE)
+#define pf_err_was_user(x)          (x & PF_ERR_USER)
 
 #endif
 

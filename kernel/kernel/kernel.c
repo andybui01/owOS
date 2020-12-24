@@ -10,8 +10,6 @@
 #include <stdint.h>
 #include <debug.h>
 
-extern uint32_t _kernel_end;
-
 void kernel_main(multiboot_info_t *mbt)
 {
 

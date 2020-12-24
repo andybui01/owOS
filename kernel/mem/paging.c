@@ -7,6 +7,9 @@
 #include <debug.h>
 #include <stdbool.h>
 #include <string.h>
+#include <int/regs.h>
+#include <kernel/irq.h>
+#include <kernel/idt.h>
 
 pgd_t *curr_dir;
 
@@ -23,11 +26,17 @@ void paging_bootstrap()
     // set current page directory to the one at end of memory
     curr_dir = (pgd_t *) PAGE_DIR_RESERVE;
 
+    // register page fault handler
+    irq_handler_t handler;
+    handler = &page_fault_handler;
+    isr_install_handler(14, handler);
+
+    printf("Paging enabled...\n");
+
     // trigger page fault
     uint32_t *ptr = (uint32_t *) 0x1000;
-    map_page((vaddr_t) 0x1000); // this line should make 0x1000 usable mem
+    // map_page((vaddr_t) 0x1000); // this line should make 0x1000 usable mem
     uint32_t trigger = *ptr;
-    printf("Paging enabled...\n");
 }
 
 // alloc a physical frame to a virtual page
@@ -93,4 +102,20 @@ void map_page(vaddr_t vaddr)
     table->entries[PAGE_TABLE_INDEX(vaddr)].entry = (frame | PTE_PRESENT | PTE_WRITABLE);
 
     tlb_flush();
+}
+
+void page_fault_handler(regs_t *r)
+{
+    vaddr_t fault_addr;
+    asm volatile("mov %%cr2, %0" : "=r" (fault_addr));
+
+    // dump stack... for now
+    printf("PAGE FAULT! TYPE: %s RW: %s PERM: %s ADDR: 0x%x\n",
+        pf_err_not_present(r->err_code) ? "non-present": "protection",
+        pf_err_was_write(r->err_code) ? "write": "read",
+        pf_err_was_user(r->err_code) ? "user": "kernel",
+        fault_addr
+    );
+
+    for (;;);
 }
