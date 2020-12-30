@@ -26,8 +26,8 @@ uint32_t last_index = 0;
 
 void pmm_bootstrap(uint32_t mmap_addr, uint32_t mmap_length)
 {
-    paddr_t kstart_pg = PG_ALIGN_DOWN(V2P(kstart_addr));
-    paddr_t kend_pg = PG_ALIGN(V2P(kend_addr));
+    paddr_t kstart_pg = FRAME_ALIGN_DOWN(V2P(kstart_addr));
+    paddr_t kend_pg = FRAME_ALIGN(V2P(kend_addr));
 
     mmap_entry_t *entry = (mmap_entry_t *) mmap_addr;
 
@@ -50,7 +50,7 @@ void pmm_bootstrap(uint32_t mmap_addr, uint32_t mmap_length)
         // printf("kstart: 0x%x kend: 0x%x\n", kstart_pg, kend_pg);
         // printf("addr: 0x%x len: 0x%x type: 0x%x\n", entry->addr_low, entry->len_low, entry->type);
 
-        uint32_t faddr = PG_ALIGN(addr);
+        uint32_t faddr = FRAME_ALIGN(addr);
 
         for (; faddr < addr + len; faddr += PAGE_SIZE) {
 

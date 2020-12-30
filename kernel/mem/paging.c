@@ -34,9 +34,9 @@ void paging_bootstrap()
     printf("Paging enabled...\n");
 
     // trigger page fault
-    uint32_t *ptr = (uint32_t *) 0x1000;
+    // uint32_t *ptr = (uint32_t *) 0x1000;
     // map_page((vaddr_t) 0x1000); // this line should make 0x1000 usable mem
-    uint32_t trigger = *ptr;
+    // uint32_t trigger = *ptr;
 }
 
 // alloc a physical frame to a virtual page
@@ -96,6 +96,10 @@ void map_page(vaddr_t vaddr)
 
     // get table
     pgt_t *table = (pgt_t *) pgt_addr;
+
+    // check if PTE currently exists
+    if (table->entries[PAGE_TABLE_INDEX(vaddr)].present)
+        return;
 
     // allocate frame for new page
     paddr_t frame = pmm_frame_alloc();
