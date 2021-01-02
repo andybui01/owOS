@@ -6,6 +6,8 @@
 #include <boot/multiboot.h>
 #include <mem/mem.h>
 
+#include <kernel/system.h>
+
 #include <stdio.h>
 #include <stdint.h>
 #include <debug.h>
@@ -15,6 +17,8 @@ void kernel_main(multiboot_info_t *mbt)
 
     // initialize terminal
     terminal_initialize();
+    outb(0x3D4, 0x0A);
+	outb(0x3D5, 0x20);
 
     // initialize GDT
     gdt_bootstrap();
