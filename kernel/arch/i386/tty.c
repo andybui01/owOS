@@ -17,8 +17,6 @@ static uint8_t terminal_color;
 static uint16_t* terminal_buffer;
 static bool terminal_overwrite;
 
-static char**
-
 void terminal_input_line()
 {
     const char* data = ">_";
