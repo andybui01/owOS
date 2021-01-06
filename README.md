@@ -16,7 +16,7 @@ check out:
 - Heap management (malloc/free)
 
 ## Coming soon
-- Enhanced graphics with framebuffer and UI
+- Userspace
 - Multiprocessing
 
 ## Debug
