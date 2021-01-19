@@ -31,7 +31,7 @@ struct tss_entry {
 	uint32_t ldt;
 	uint16_t trap;
 	uint16_t iomap;
-};
+} __attribute__((packed));
 
 typedef struct tss_entry tss_entry_t;
 

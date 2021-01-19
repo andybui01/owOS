@@ -4,7 +4,7 @@
 #ifndef __ASSEMBLER__
 #include <stdint.h>
 
-#define GDT_ENTRIES 5
+#define GDT_ENTRIES 6
 
 // We define these variables in this order so that for the entire GDT entry
 // all the bits are next to each other in memory
@@ -46,8 +46,6 @@ struct gdt_ptr {
 } __attribute__((packed));
 
 typedef struct gdt_ptr gdt_ptr_t;
-
-extern void gdt_flush(uintptr_t);
 
 void gdt_bootstrap();
 void gdt_create_desc(unsigned int num, uint32_t base, uint32_t limit, uint8_t access, uint8_t flags);
