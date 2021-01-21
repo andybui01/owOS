@@ -13,6 +13,8 @@
 
 pgd_t *curr_dir;
 
+static void page_fault_handler(regs_t*);
+
 // flush tlb entry CURRENTLY FLUSHES ENTIRE TLB CHANGE TO INVLPG
 static inline void tlb_flush(void)
 {
@@ -34,9 +36,9 @@ void paging_bootstrap()
     printf("Paging enabled...\n");
 
     // trigger page fault
-    // uint32_t *ptr = (uint32_t *) 0x1000;
+    uint32_t *ptr = (uint32_t *) 0x1000;
     // map_page((vaddr_t) 0x1000); // this line should make 0x1000 usable mem
-    // uint32_t trigger = *ptr;
+    uint32_t trigger = *ptr;
 }
 
 // alloc a physical frame to a virtual page
@@ -108,7 +110,7 @@ void map_page(vaddr_t vaddr)
     tlb_flush();
 }
 
-void page_fault_handler(regs_t *r)
+static void page_fault_handler(regs_t *r)
 {
     vaddr_t fault_addr;
     asm volatile("mov %%cr2, %0" : "=r" (fault_addr));

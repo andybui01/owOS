@@ -32,7 +32,6 @@ void paging_bootstrap();
 bool page_alloc(pte_t *pte);
 void page_free(pte_t *pte);
 void map_page(vaddr_t vaddr);
-void page_fault_handler(regs_t *r);
 
 
 #define PAGE_INDEX_MASK 0x3ff
