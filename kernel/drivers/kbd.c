@@ -7,6 +7,9 @@
 // temp
 #include <stdio.h>
 
+// static function declarations
+static void keyboard_handler(regs_t *r);
+
 // Some useful defines
 #define KB_SHIFT_LEFT   0x2A
 #define KB_SHIFT_RIGHT  0x36
@@ -22,7 +25,7 @@ circ_bbuf_t inbuffer = {
     .maxlen = 32
 };
 
-// borrowing bran's scan codes table
+// borrowing bran's scan codes table, this is a fucking mess
 unsigned char sc_qwerty[128] = {
     0,  27, '1', '2', '3', '4', '5', '6', '7', '8',	/* 9 */
     '9', '0', '-', '=', '\b',	/* Backspace */
@@ -101,10 +104,19 @@ unsigned char sc_qwerty_shifted[128] = {
     0,	/* All other keys are undefined */
 };
 
-// flags
-uint8_t shift_flag = 0;
+////////////////////////////////////////////////////////////
 
-void keyboard_handler(regs_t *r)
+void keyboard_bootstrap(void)
+{
+    irq_handler_t handler;
+    handler = &keyboard_handler;
+    isr_install_handler(33, handler);
+}
+
+// flags
+static uint8_t shift_flag = 0;
+
+static void keyboard_handler(regs_t *r)
 {
     (void) r;
     uint8_t scan_code = pic_scan_code();

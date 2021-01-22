@@ -4,6 +4,6 @@
 #include <kernel/idt.h>
 #include <int/regs.h>
 
-void keyboard_handler(regs_t *r);
+void keyboard_bootstrap(void);
 
 #endif

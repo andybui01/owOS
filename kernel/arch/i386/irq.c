@@ -3,14 +3,17 @@
 #include <kernel/idt.h>
 #include <int/regs.h>
 
-#define KEYBOARD_INT 33
+#include <stdio.h>
 
-extern void keyboard_handler(regs_t *);
+static void temp_handler(regs_t*);
 
-void irq_install_handlers(void) 
+void irq_install_handlers(void)
 {
-    irq_handler_t handler;
+    // Install temporary handlers
+    isr_install_handler(13, &temp_handler);
+}
 
-    handler = &keyboard_handler;
-    isr_install_handler(KEYBOARD_INT, handler);
+static void temp_handler(regs_t *r)
+{
+    printf("Unhandled interrupt #%d\n", r->int_no);
 }

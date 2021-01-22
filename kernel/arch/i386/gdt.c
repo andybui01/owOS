@@ -81,7 +81,11 @@ void gdt_bootstrap()
                                                     )
                                                 );
 
-    tss_write(GDT_INDEX_TSS, 0x10, 0x0);
+    // tss_write requires the kernel stack segment and stack pointer,
+    // however, when initializing the TSS, the values don't matter and we can use 0.
+    // This is because on a task change (in our case going from kernel to user mode),
+    // the cpu automatically fills out the TSS.
+    tss_write(GDT_INDEX_TSS, 0, 0);
 
     // Flush old GDT (GRUB) and implement new one
     gdt_flush((uintptr_t) &gp);
@@ -106,7 +110,6 @@ void gdt_create_desc(unsigned int num, uint32_t base, uint32_t limit, uint8_t ac
     gdt[num].access = access;
 }
 
-// this does nothing for now except create a descriptor in the GDT
 static void tss_write(unsigned int num, uint16_t ss0, uint32_t esp0)
 {
     uint32_t base = (uint32_t) &tss;
@@ -123,11 +126,14 @@ static void tss_write(unsigned int num, uint16_t ss0, uint32_t esp0)
     memset(&tss, 0, sizeof(tss_entry_t));
     tss.ss0 = ss0;
     tss.esp0 = esp0;
-    tss.cs = 0x0b;
+    // tss.cs = (SEGMENT_SELECTOR_INDEX(GDT_INDEX_CS0) | TABLE_GDT_MASK | RPL_USER);
 
-	tss.ss =
-	tss.ds =
-	tss.es =
-	tss.fs =
-	tss.gs = 0x13;
+	// tss.ss =
+	// tss.ds =
+	// tss.es =
+	// tss.fs =
+	// tss.gs = (SEGMENT_SELECTOR_INDEX(GDT_INDEX_DS0) | TABLE_GDT_MASK | RPL_USER);
+
+    // Haven't really looked into iomap so leaving this here
+    // tss.iomap = sizeof(tss_entry_t);
 }

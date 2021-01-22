@@ -25,20 +25,21 @@ void idt_bootstrap()
 
     idt_flush((uintptr_t)&ip);
 
-	isrs_install();
+    isrs_install();
 }
 
 void isrs_install()
 {
-	// For full list of exceptions visit: https://wiki.osdev.org/Exceptions
-	// TODO: fix magic numbers, separate type_attr and create more struct variables for idt_gate
-	idt_create_gate(0, (uint32_t) &_isr0, 0x08, 0x8E);
-	idt_create_gate(1, (uint32_t) &_isr1, 0x08, 0x8E);
-	idt_create_gate(14, (uint32_t) &_isr14, 0x08, 0x8E);
-	idt_create_gate(32, (uint32_t) &_isr32, 0x08, 0x8E);
-	idt_create_gate(33, (uint32_t) &_isr33, 0x08, 0x8E);
+    // For full list of exceptions visit: https://wiki.osdev.org/Exceptions
+    // TODO: fix magic numbers, separate type_attr and create more struct variables for idt_gate
+    idt_create_gate(0, (uint32_t) &_isr0, 0x08, 0x8E);
+    idt_create_gate(1, (uint32_t) &_isr1, 0x08, 0x8E);
+    idt_create_gate(13, (uint32_t) &_isr13, 0x08, 0x8E);
+    idt_create_gate(14, (uint32_t) &_isr14, 0x08, 0x8E);
+    idt_create_gate(32, (uint32_t) &_isr32, 0x08, 0x8E);
+    idt_create_gate(33, (uint32_t) &_isr33, 0x08, 0x8E);
 
-	irq_install_handlers();
+    irq_install_handlers();
 }
 
 void idt_create_gate(int num, uint32_t offset, uint16_t selector, uint8_t type_attr)
@@ -56,23 +57,19 @@ void idt_create_gate(int num, uint32_t offset, uint16_t selector, uint8_t type_a
 
 void isr_install_handler(int index, irq_handler_t handler)
 {
-	handlers[index] = handler;
+    handlers[index] = handler;
 }
 
 void isr_uninstall_handler(int index)
 {
-	handlers[index] = 0;
+    handlers[index] = 0;
 }
 
 void fault_handler(regs_t *r)
 {
-	irq_handler_t handler = handlers[r->int_no];
+    irq_handler_t handler = handlers[r->int_no];
 
-	if (handler) {
-		handler(r);
-	} else {
-		// unhandled exception, die
-		printf("unhandled exception #%d: dying :(\n", r->int_no);
-		for (;;);
-	}
+    if (handler) {
+        handler(r);
+    }
 }
