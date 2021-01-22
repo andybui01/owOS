@@ -21,35 +21,16 @@ LIBS:=$(LIBS) -nostdlib -lk -lgcc
 ARCHDIR=arch/$(HOSTARCH)
 
 include $(ARCHDIR)/make.config
-
-CFLAGS:=$(CFLAGS) $(KERNEL_ARCH_CFLAGS)
-CPPFLAGS:=$(CPPFLAGS) $(KERNEL_ARCH_CPPFLAGS)
-LDFLAGS:=$(LDFLAGS) $(KERNEL_ARCH_LDFLAGS)
-LIBS:=$(LIBS) $(KERNEL_ARCH_LIBS)
+include drivers/make.config
+include mem/make.config
+include system/make.config
 
 ALL_OBJS=\
 $(KERNEL_ARCH_OBJS) \
 kernel/kernel.o \
-
-include drivers/make.config
-
-CFLAGS:=$(CFLAGS) $(DRIVERS_CFLAGS)
-CPPFLAGS:=$(CPPFLAGS) $(DRIVERS_CPPFLAGS)
-LDFLAGS:=$(LDFLAGS) $(DRIVERS_LDFLAGS)
-LIBS:=$(LIBS) $(DRIVERS_LIBS)
-
-ALL_OBJS:=$(ALL_OBJS) \
 $(DRIVERS_OBJS) \
-
-include mem/make.config
-
-CFLAGS:=$(CFLAGS) $(MEM_CFLAGS)
-CPPFLAGS:=$(CPPFLAGS) $(MEM_CPPFLAGS)
-LDFLAGS:=$(LDFLAGS) $(MEM_LDFLAGS)
-LIBS:=$(LIBS) $(MEM_LIBS)
-
-ALL_OBJS:=$(ALL_OBJS) \
 $(MEM_OBJS) \
+$(SYSTEM_OBJS) \
 
 OBJS=\
 $(ARCHDIR)/crti.o \
