@@ -5,12 +5,16 @@
 #include <drivers/kbd.h>
 #include <boot/multiboot.h>
 #include <mem/mem.h>
+#include <system/syscall.h>
+#include <drivers/drivers.h>
 
 #include <kernel/system.h>
 
 #include <stdio.h>
 #include <stdint.h>
 #include <debug.h>
+
+static void switch_to_user_mode(void);
 
 void kernel_main(multiboot_info_t *mbt)
 {
@@ -31,11 +35,51 @@ void kernel_main(multiboot_info_t *mbt)
     // remap PIC
     pic_remap(0x20, 0x28);
 
+    // initialize drivers
+    drivers_bootstrap();
+
     mem_bootstrap(mbt);
+
+    // initialize syscall interface
+    syscall_bootstrap();
+
+    // jump to userspace
+    switch_to_user_mode();
+
+    // syscall test
+    asm volatile(" \
+        xor %eax, %eax; \
+        int $0x80; \
+        ");
 
     // infinite loop ya!
     for (;;) {
         asm("hlt");
     }
 
+}
+
+static void switch_to_user_mode(void)
+{
+    // Set up a stack structure for switching to user mode.
+    asm volatile("  \
+        // cli; \
+        mov $0x23, %ax; \
+        mov %ax, %ds; \
+        mov %ax, %es; \
+        mov %ax, %fs; \
+        mov %ax, %gs; \
+                    \
+        mov %esp, %eax; \
+        pushl $0x23; \
+        pushl %eax; \
+        pushf; \
+        // pop %eax; \
+        // or %eax, $0x200; \
+        // push %eax; \
+        pushl $0x1B; \
+        push $1f; \
+        iret; \
+    1: \
+    ");
 }
