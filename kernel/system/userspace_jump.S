@@ -29,4 +29,7 @@ userspace_jump:
     iret
 1:
     // in user mode now, test syscall and infinite loop
-    jmp 1b
+    mov $0, %eax
+    int $0x80
+2:
+    jmp 2b

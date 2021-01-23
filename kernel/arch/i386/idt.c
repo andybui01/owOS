@@ -39,7 +39,7 @@ void isrs_install()
     idt_create_gate(32, (uint32_t) &_isr32, 0x08, 0x8E);
     idt_create_gate(33, (uint32_t) &_isr33, 0x08, 0x8E);
 
-    idt_create_gate(0x80, (uint32_t) &_isr128, 0x1b, 0xEE);
+    idt_create_gate(0x80, (uint32_t) &_isr128, 0x08, 0xEE);
 
     irq_install_handlers();
 }

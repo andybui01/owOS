@@ -55,9 +55,9 @@ void kernel_main(multiboot_info_t *mbt)
     //     ");
 
     // infinite loop ya! (privileged instruction!)
-    for (;;) {
-        asm("hlt");
-    }
+    // for (;;) {
+    //     asm("hlt");
+    // }
 
 }
 
