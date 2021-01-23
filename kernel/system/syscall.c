@@ -15,7 +15,7 @@ static void *syscalls[MAX_SYSCALLS] = {
 
 void syscall_bootstrap(void)
 {
-    // register page fault handler
+    // register syscall handler
     irq_handler_t handler;
     handler = &syscall_handler;
     isr_install_handler(INT_SYSCALL, handler);
