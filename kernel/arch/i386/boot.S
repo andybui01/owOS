@@ -48,7 +48,7 @@ _start:
     // Map physical address as "present, writable". Note that this maps
     // .text and .rodata as writable. Mind security and map them as non-writable.
     movl %esi, %edx
-    orl $(PTE_PRESENT | PTE_WRITABLE), %edx
+    orl $(PTE_PRESENT | PTE_WRITABLE | PTE_USER), %edx
     movl %edx, (%edi)
 
     // Size of page is 4096 bytes.
@@ -67,14 +67,14 @@ _start:
 
     // Map the page table to both virtual addresses 0x00000000 and 0xC0000000.
     movl $V2P_WO(boot_page_table1), %ecx
-    orl $(PDE_PRESENT | PDE_WRITABLE), %ecx
+    orl $(PDE_PRESENT | PDE_WRITABLE | PDE_USER), %ecx
 
     movl %ecx, V2P_WO(boot_page_directory) + 0
     movl %ecx, V2P_WO(boot_page_directory) + 768 * 4
 
     // Make boot_page_directory the last page table
     movl $V2P_WO(boot_page_directory), %ecx
-    orl $(PDE_PRESENT | PDE_WRITABLE), %ecx
+    orl $(PDE_PRESENT | PDE_WRITABLE | PDE_USER), %ecx
     movl %ecx, V2P_WO(boot_page_directory) + 1023 * 4
 
 
@@ -84,7 +84,7 @@ _start:
 
     // Enable paging and the write-protect bit.
     movl %cr0, %ecx
-    orl $0x80000000, %ecx
+    orl $0x80000001, %ecx
     movl %ecx, %cr0
 
     // Jump to higher half with an absolute jump.

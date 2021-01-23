@@ -15,5 +15,5 @@ void irq_install_handlers(void)
 
 static void temp_handler(regs_t *r)
 {
-    printf("Unhandled interrupt #%d\n", r->int_no);
+    printf("Unhandled interrupt #%d err 0x%x\n", r->int_no, r->err_code);
 }

@@ -39,6 +39,8 @@ void isrs_install()
     idt_create_gate(32, (uint32_t) &_isr32, 0x08, 0x8E);
     idt_create_gate(33, (uint32_t) &_isr33, 0x08, 0x8E);
 
+    idt_create_gate(0x80, (uint32_t) &_isr128, 0x1b, 0xEE);
+
     irq_install_handlers();
 }
 
@@ -52,7 +54,7 @@ void idt_create_gate(int num, uint32_t offset, uint16_t selector, uint8_t type_a
 
     idt[num].zero = 0;
 
-    idt[num].type_attr = type_attr | 0x60; // force to ring 0: change later
+    idt[num].type_attr = type_attr;
 }
 
 void isr_install_handler(int index, irq_handler_t handler)
