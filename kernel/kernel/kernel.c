@@ -16,8 +16,6 @@
 
 extern void userspace_jump(void);
 
-static void switch_to_user_mode(void);
-
 void kernel_main(multiboot_info_t *mbt)
 {
 
@@ -48,40 +46,9 @@ void kernel_main(multiboot_info_t *mbt)
     // jump to userspace
     userspace_jump();
 
-    // syscall test
-    // asm volatile(" \
-    //     xor %eax, %eax; \
-    //     int $0x80; \
-    //     ");
-
     // infinite loop ya! (privileged instruction!)
     // for (;;) {
     //     asm("hlt");
     // }
 
-}
-
-static void switch_to_user_mode(void)
-{
-    // Set up a stack structure for switching to user mode.
-    asm volatile("  \
-        // cli; \
-        mov $0x23, %ax; \
-        mov %ax, %ds; \
-        mov %ax, %es; \
-        mov %ax, %fs; \
-        mov %ax, %gs; \
-                    \
-        mov %esp, %eax; \
-        pushl $0x23; \
-        pushl %eax; \
-        pushf; \
-        // pop %eax; \
-        // orl $0x200, %eax; \
-        // push %eax; \
-        pushl $0x1B; \
-        push $1f; \
-        iret; \
-    1: \
-    ");
 }

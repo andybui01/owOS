@@ -5,6 +5,13 @@
 #include <int/regs.h>
 #include <kernel/irq.h>
 
+#define IDT_TASK    0x05
+#define IDT_INT     0x06
+#define IDT_TRAP    0x07
+#define IDT_SIZE    0x08 // gates are 32 bits, else 16 bits
+#define IDT_DPL(x)  (x << 5)
+#define IDT_PRESENT 0x80
+
 // The IDT entries are called gates.
 // It can contain Interrupt Gates, Task Gates and Trap Gates.
 struct idt_gate {

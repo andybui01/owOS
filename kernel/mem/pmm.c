@@ -97,7 +97,9 @@ uint32_t pmm_frame_alloc(void)
         }
     }
 
-    return -1;
+    // since this function returns page aligned addresses,
+    // we can use this to signal an error
+    return 1;
 }
 
 void pmm_frame_dealloc(uint32_t faddr)

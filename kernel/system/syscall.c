@@ -1,5 +1,6 @@
 #include <system/syscall.h>
 #include <int/regs.h>
+#include <int/int.h>
 #include <kernel/irq.h>
 #include <kernel/idt.h>
 

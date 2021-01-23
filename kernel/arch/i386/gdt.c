@@ -126,14 +126,14 @@ static void tss_write(unsigned int num, uint16_t ss0, uint32_t esp0)
     memset(&tss, 0, sizeof(tss_entry_t));
     tss.ss0 = ss0;
     tss.esp0 = esp0;
-    tss.cs = (SEGMENT_SELECTOR_INDEX(GDT_INDEX_CS0) | TABLE_GDT_MASK | RPL_USER);
+    // tss.cs = (SEG_SELECTOR(GDT_INDEX_CS0) | TABLE_GDT_MASK | RPL_USER);
 
-	tss.ss =
-	tss.ds =
-	tss.es =
-	tss.fs =
-	tss.gs = (SEGMENT_SELECTOR_INDEX(GDT_INDEX_DS0) | TABLE_GDT_MASK | RPL_USER);
+	// tss.ss =
+	// tss.ds =
+	// tss.es =
+	// tss.fs =
+	// tss.gs = (SEG_SELECTOR(GDT_INDEX_DS0) | TABLE_GDT_MASK | RPL_USER);
 
     // Haven't really looked into iomap so leaving this here
-    tss.iomap = sizeof(tss_entry_t);
+    // tss.iomap = sizeof(tss_entry_t);
 }

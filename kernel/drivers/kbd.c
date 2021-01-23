@@ -1,6 +1,7 @@
 #include <drivers/kbd.h>
 #include <drivers/pic.h>
 #include <int/regs.h>
+#include <int/int.h>
 #include <ds.h>
 #include <stdint.h>
 
@@ -110,7 +111,7 @@ void keyboard_bootstrap(void)
 {
     irq_handler_t handler;
     handler = &keyboard_handler;
-    isr_install_handler(33, handler);
+    isr_install_handler(INT_KBD, handler);
 }
 
 // flags

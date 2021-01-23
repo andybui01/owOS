@@ -12,7 +12,7 @@ gdt_flush:
     mov 4(%esp), %eax
     lgdt (%eax)
 
-    mov $(SEGMENT_SELECTOR_INDEX(GDT_INDEX_DS0) | TABLE_GDT_MASK | RPL_KERNEL), %ax
+    mov $(SEG_SELECTOR(GDT_INDEX_DS0) | TABLE_GDT_MASK | RPL_KERNEL), %ax
     mov %ax, %ds
     mov %ax, %es
     mov %ax, %fs
@@ -22,7 +22,7 @@ gdt_flush:
     // Jump to flush2, an offset in the NEW code segment we just
     // put in the GDT. We do this because a MOV instruction
     // with the CS register will not suffice.
-    ljmp $(SEGMENT_SELECTOR_INDEX(GDT_INDEX_CS0) | TABLE_GDT_MASK | RPL_KERNEL), $flush2
+    ljmp $(SEG_SELECTOR(GDT_INDEX_CS0) | TABLE_GDT_MASK | RPL_KERNEL), $flush2
 
 flush2:
     ret

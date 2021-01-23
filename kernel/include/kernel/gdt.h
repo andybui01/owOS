@@ -63,9 +63,12 @@ void gdt_create_desc(unsigned int num, uint32_t base, uint32_t limit, uint8_t ac
 #define TABLE_GDT_MASK 0x0
 #define TABLE_LDT_MASK 0x4
 
+#define DPL_KERNEL  0x0
+#define DPL_USER    0x3
+
 #define RPL_KERNEL  0x0
 #define RPL_USER    0x3
 
-#define SEGMENT_SELECTOR_INDEX(x) (x << 3)
+#define SEG_SELECTOR(x) (x << 3)
 
 #endif

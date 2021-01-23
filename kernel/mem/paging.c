@@ -47,7 +47,7 @@ bool page_alloc(pte_t *pte)
     // allocate a free physical frame
     paddr_t p = pmm_frame_alloc();
 
-    if (p == -1)
+    if (p == 1)
         return false;
 
     // map page to frame
