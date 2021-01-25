@@ -17,6 +17,7 @@ check out:
 - Userspace
 
 ## Coming soon
+- Graphics
 - Multiprocessing
 - File system
 
