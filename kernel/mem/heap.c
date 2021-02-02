@@ -14,7 +14,7 @@ static heap_t heap;
 void heap_bootstrap(void)
 {
     heap.curr = PG_ALIGN(kend_addr);
-    heap.end = (vaddr_t) PAGE_TABLES_RESERVE;
+    heap.end = (vaddr_t) KHEAP_END;
     heap.last_page = heap.curr;
 }
 

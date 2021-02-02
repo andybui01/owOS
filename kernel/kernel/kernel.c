@@ -7,6 +7,7 @@
 #include <mem/mem.h>
 #include <system/syscall.h>
 #include <drivers/drivers.h>
+#include <drivers/framebuffer.h>
 
 #include <kernel/system.h>
 
@@ -20,11 +21,17 @@ void kernel_main(multiboot_info_t *mbt)
 {
 
     // initialize terminal
-    terminal_initialize();
+    // terminal_initialize();
+
+    fb_bootstrap(mbt);
+
+    for (;;) {
+        asm("hlt");
+    }
 
     // get rid of blinking cursor
-    outb(0x3D4, 0x0A);
-	outb(0x3D5, 0x20);
+    // outb(0x3D4, 0x0A);
+	// outb(0x3D5, 0x20);
 
     // initialize GDT
     gdt_bootstrap();

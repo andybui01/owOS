@@ -2,11 +2,12 @@
 #include <mem/paging.h>
 
 // Declare constants for the multiboot header.
-.set ALIGN,    1<<0             // align loaded modules on page boundaries
-.set MEMINFO,  1<<1             // provide memory map
-.set FLAGS,    ALIGN | MEMINFO  // this is the Multiboot 'flag' field
-.set MAGIC,    0x1BADB002       // 'magic number' lets bootloader find the header
-.set CHECKSUM, -(MAGIC + FLAGS) // checksum of above, to prove we are multiboot
+.set ALIGN,     1<<0                        // align loaded modules on page boundaries
+.set MEMINFO,   1<<1                        // provide memory map
+.set VIDEO,     1<<2                        // provide info about video mode
+.set FLAGS,     ALIGN | MEMINFO | VIDEO     // this is the Multiboot 'flag' field
+.set MAGIC,     0x1BADB002                  // 'magic number' lets bootloader find the header
+.set CHECKSUM,  -(MAGIC + FLAGS)            // checksum of above, to prove we are multiboot
 
 // Declare a multiboot header that marks the program as a kernel.
 .section .multiboot
@@ -14,6 +15,15 @@
 .long MAGIC
 .long FLAGS
 .long CHECKSUM
+.long 0x00000000 // header_addr
+.long 0x00000000 // load_addr
+.long 0x00000000 // load_end_addr
+.long 0x00000000 // bss_end_addr
+.long 0x00000000 // entry_addr
+.long 0 // linear framebuffer
+.long 1024 // width
+.long 768 // height
+.long 32 // bpp
 
 // Allocate the initial stack.
 .section .bootstrap_stack, "aw", @nobits
@@ -30,6 +40,8 @@ stack_top:
 boot_page_directory:
     .fill 1024, 4, 0
 boot_page_table1:
+    .fill 1024, 4, 0
+boot_page_table2:
     .fill 1024, 4, 0
 // Add more as necessary
 
@@ -64,6 +76,21 @@ _start:
     // this will continue until ecx = 0
     loop .page_table_loop
 
+    movl $0xFD000000, %esi
+    movl $1024, %ecx
+
+.framebuffer_loop:
+    movl %esi, %edx
+    orl $(PTE_PRESENT | PTE_WRITABLE | PTE_USER), %edx
+    movl %edx, (%edi)
+
+    // Size of page is 4096 bytes.
+    addl $4096, %esi
+    // Size of entries in boot_page_table2 is 4 bytes.
+    addl $4, %edi
+
+    loop .framebuffer_loop
+
 
     // Map the page table to both virtual addresses 0x00000000 and 0xC0000000.
     movl $V2P_WO(boot_page_table1), %ecx
@@ -71,6 +98,11 @@ _start:
 
     movl %ecx, V2P_WO(boot_page_directory) + 0
     movl %ecx, V2P_WO(boot_page_directory) + 768 * 4
+
+    // Set framebuffer to second last page table
+    movl $V2P_WO(boot_page_table2), %ecx
+    orl $(PDE_PRESENT | PDE_WRITABLE | PDE_USER), %ecx
+    movl %ecx, V2P_WO(boot_page_directory) + 1022 * 4
 
     // Make boot_page_directory the last page table
     movl $V2P_WO(boot_page_directory), %ecx

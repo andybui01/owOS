@@ -138,6 +138,38 @@ struct multiboot_elf_section_header_table
 };
 typedef struct multiboot_elf_section_header_table multiboot_elf_section_header_table_t;
 
+/* Framebuffer struct*/
+struct fb_info
+{
+	uint32_t addr_low, addr_high;
+	uint32_t pitch;
+	uint32_t width;
+	uint32_t height;
+	uint8_t bpp;
+#define MULTIBOOT_FRAMEBUFFER_TYPE_INDEXED  0
+#define MULTIBOOT_FRAMEBUFFER_TYPE_RGB      1
+#define MULTIBOOT_FRAMEBUFFER_TYPE_EGA_TEXT 2
+	uint8_t type;
+	union
+	{
+		struct
+		{
+			uint32_t palette_addr;
+			uint16_t palette_num_colors;
+		};
+		struct
+		{
+			uint8_t red_field_position;
+			uint8_t red_mask_size;
+			uint8_t green_field_position;
+			uint8_t green_mask_size;
+			uint8_t blue_field_position;
+			uint8_t blue_mask_size;
+		};
+	};
+}__attribute__ ((packed));
+typedef struct fb_info fb_info_t;
+
 struct multiboot_info
 {
 	/* Multiboot info version number */
@@ -188,32 +220,7 @@ struct multiboot_info
 	uint16_t vbe_interface_off;
 	uint16_t vbe_interface_len;
 
-	uint64_t framebuffer_addr;
-	uint32_t framebuffer_pitch;
-	uint32_t framebuffer_width;
-	uint32_t framebuffer_height;
-	uint8_t framebuffer_bpp;
-#define MULTIBOOT_FRAMEBUFFER_TYPE_INDEXED  0
-#define MULTIBOOT_FRAMEBUFFER_TYPE_RGB      1
-#define MULTIBOOT_FRAMEBUFFER_TYPE_EGA_TEXT 2
-	uint8_t framebuffer_type;
-	union
-	{
-		struct
-		{
-			uint32_t framebuffer_palette_addr;
-			uint16_t framebuffer_palette_num_colors;
-		};
-		struct
-		{
-			uint8_t framebuffer_red_field_position;
-			uint8_t framebuffer_red_mask_size;
-			uint8_t framebuffer_green_field_position;
-			uint8_t framebuffer_green_mask_size;
-			uint8_t framebuffer_blue_field_position;
-			uint8_t framebuffer_blue_mask_size;
-		};
-	};
+	fb_info_t fb;
 };
 typedef struct multiboot_info multiboot_info_t;
 
